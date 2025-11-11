@@ -5,15 +5,16 @@ using FleetManager.Model;
 using FleetManager.Model.Enums;
 using FleetManager.Repository;
 using FleetManager.Security;
+using FleetManager.Service.Interfaces;
 
 namespace FleetManager.Service;
 
-public class UserService
+public class UserService:IUserService
 {
     private readonly IUserRepository _repository;
-    private readonly PasswordHasher _passwordHasher;
+    private readonly IPasswordHasher _passwordHasher;
     
-    public UserService(IUserRepository repository, PasswordHasher passwordHasher)
+    public UserService(IUserRepository repository, IPasswordHasher passwordHasher)
     {
         _repository = repository;
         _passwordHasher = passwordHasher;
@@ -62,7 +63,7 @@ public class UserService
         if (user == null)
             throw new InvalidCredentialsException("Invalid username or password");
 
-        bool valid = _passwordHasher.VerifyPassword(user.passwordHash, dto.Password);
+        var valid = _passwordHasher.VerifyPassword(user.passwordHash, dto.Password);
         if (!valid)
             throw new InvalidCredentialsException("Invalid username or password");
 
