@@ -1,5 +1,9 @@
 using DotNetEnv;
 using FleetManager.Data;
+using FleetManager.Repository;
+using FleetManager.Security;
+using FleetManager.Service;
+using FleetManager.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +21,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
+
+
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -31,6 +41,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseExceptionHandler("/error");
 app.UseHttpsRedirection();
+app.MapControllers();
 
 
 app.Run();

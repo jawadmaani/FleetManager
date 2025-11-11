@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
 namespace FleetManager.Security;
-public class PasswordHasher
+public class PasswordHasher:IPasswordHasher
 {
-    private readonly PasswordHasher<object> _hasher = new();
+    private readonly PasswordHasher<object?> _hasher = new();
 
     public string HashPassword(string password)
     {

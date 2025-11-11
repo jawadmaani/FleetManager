@@ -1,6 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 using FleetManager.Model.Enums;
 
+namespace FleetManager.Dto;
+
 public class UserResponseDto
 {
     public int Id { get; set; }
