@@ -1,6 +1,7 @@
 using DotNetEnv;
 using FleetManager.Data;
 using FleetManager.Repository;
+using FleetManager.Repository.Interfaces;
 using FleetManager.Security;
 using FleetManager.Service;
 using FleetManager.Service.Interfaces;
@@ -15,15 +16,34 @@ string db = Environment.GetEnvironmentVariable("POSTGRES_DB")!;
 string user = Environment.GetEnvironmentVariable("POSTGRES_USER")!;
 string password = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD")!;
 
+string refreshSecret = Environment.GetEnvironmentVariable("REFRESH_TOKEN_SECRET");
+
+if (string.IsNullOrWhiteSpace(refreshSecret))
+{
+    throw new InvalidOperationException("REFRESH_TOKEN_SECRET is not set in the environment.");
+}
+
+
 var connectionString = $"Host={host};Port={port};Database={db};Username={user};Password={password}";
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 
+// Data Access
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+
+// Security & Hashing
+builder.Services.AddScoped<ITokenHashStrategy, HmacSha512HashStrategy>();
+builder.Services.AddSingleton(new TokenHasher(refreshSecret, new HmacSha512HashStrategy()));
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
+
+// Services
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+
 
 
 builder.Services.AddControllers();
