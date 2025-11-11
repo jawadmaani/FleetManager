@@ -25,7 +25,14 @@ public class RefreshTokenRepository: IRefreshTokenRepository
             .FromSqlRaw("SELECT * FROM \"RefreshTokens\" WHERE \"RefreshTokenHash\" = {0} FOR UPDATE", refreshTokenHash)
             .FirstOrDefaultAsync();
     }
-    
+
+    public async Task<RefreshToken?> GetByUserIdAsync(int userId)
+    {
+        return await _context.RefreshTokens
+            .FirstOrDefaultAsync(rt => rt.UserId == userId);
+    }
+
+
     public async Task CreateAsync(RefreshToken entity)
     {
         await _context.RefreshTokens.AddAsync(entity);

@@ -1,5 +1,4 @@
 ﻿namespace FleetManager.Security;
-
 public class TokenHasher
 {
     private readonly string _secretKey;

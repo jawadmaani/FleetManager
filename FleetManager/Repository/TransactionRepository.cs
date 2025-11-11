@@ -2,6 +2,7 @@
 using FleetManager.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore.Storage;
 
+namespace FleetManager.Repository;
 
 public class TransactionRepository:ITransactionRepository
 {
