@@ -1,0 +1,71 @@
+﻿using FleetManager.Dto;
+using FleetManager.Exception.UserExceptions;
+using FleetManager.Mapper;
+using FleetManager.Model;
+using FleetManager.Model.Enums;
+using FleetManager.Repository;
+using FleetManager.Security;
+
+namespace FleetManager.Service;
+
+public class UserService
+{
+    private readonly IUserRepository _repository;
+    private readonly PasswordHasher _passwordHasher;
+    
+    public UserService(IUserRepository repository, PasswordHasher passwordHasher)
+    {
+        _repository = repository;
+        _passwordHasher = passwordHasher;
+    }
+
+    public async Task<List<UserResponseDto>> GetAllUsersAsync()
+    {
+        var users = await _repository.GetAllUsersAsync();
+        if (users == null || !users.Any())
+            throw new NoUsersFoundException("No users found.");
+
+        return UserMapper.ToUserResponseDtoList(users);
+    }
+
+    public async Task<UserResponseDto> GetUserByIdAsync(int id)
+    {
+        var user = await _repository.GetUserByIdAsync(id);
+        if (user == null)
+            throw new UserNotFoundException($"No user found with ID {id}");
+
+        return UserMapper.ToUserResponseDto(user);
+    }
+
+    public async Task<UserResponseDto> RegisterAsync(UserRequestDto dto)
+    {
+        var existingUser = await _repository.GetUserByUsernameAsync(dto.Username);
+        if (existingUser != null)
+            throw new UserAlreadyExistsException("Username already exists");
+
+        var user = new User
+        {
+            Username = dto.Username,
+            passwordHash = _passwordHasher.HashPassword(dto.Password),
+            role = UserRole.Viewer
+        };
+
+        await _repository.CreateAsync(user);
+        await _repository.SaveAsync();
+
+        return UserMapper.ToUserResponseDto(user);
+    }
+
+    public async Task<(int userId, string role)> LoginAsync(UserRequestDto dto)
+    {
+        var user = await _repository.GetUserByUsernameAsync(dto.Username);
+        if (user == null)
+            throw new InvalidCredentialsException("Invalid username or password");
+
+        bool valid = _passwordHasher.VerifyPassword(user.passwordHash, dto.Password);
+        if (!valid)
+            throw new InvalidCredentialsException("Invalid username or password");
+
+        return (user.Id, user.role.ToString());
+    }
+}
