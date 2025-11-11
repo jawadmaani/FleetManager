@@ -1,12 +1,12 @@
 ﻿using FleetManager.Dto;
 using FleetManager.Service.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 
 namespace FleetManager.Controller
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Produces("application/json")]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
