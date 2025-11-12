@@ -57,7 +57,7 @@ public class UserService:IUserService
         return UserMapper.ToUserResponseDto(user);
     }
 
-    public async Task<(int userId, string role)> LoginAsync(UserRequestDto dto)
+    public async Task<UserLoginResultDto> LoginAsync(UserRequestDto dto)
     {
         var user = await _repository.GetUserByUsernameAsync(dto.Username);
         if (user == null)
@@ -67,6 +67,10 @@ public class UserService:IUserService
         if (!valid)
             throw new InvalidCredentialsException("Invalid username or password");
 
-        return (user.Id, user.role.ToString());
-    }
+        return new UserLoginResultDto
+        {
+            UserId = user.Id,
+            Role = user.role.ToString(),
+            User = UserMapper.ToUserResponseDto(user)
+        };    }
 }

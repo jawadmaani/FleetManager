@@ -2,25 +2,26 @@
 
 public static class CookieHelper
 {
+    private const string RefreshTokenCookieName = "refreshToken";
+    private const int RefreshTokenLifetimeInDays = 7;
+
+    private static CookieOptions BaseOptions => new()
+    {
+        HttpOnly = true,
+        Secure = true,
+        SameSite = SameSiteMode.Strict,
+        Path = "/"
+    };
+
     public static void SetRefreshTokenCookie(HttpResponse response, string token)
     {
-        var cookieOptions = new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict,
-            Expires = DateTimeOffset.UtcNow.AddDays(7)
-        };
-        response.Cookies.Append("refreshToken", token, cookieOptions);
+        var options = BaseOptions;
+        options.Expires = DateTimeOffset.UtcNow.AddDays(RefreshTokenLifetimeInDays);
+        response.Cookies.Append(RefreshTokenCookieName, token, options);
     }
 
     public static void DeleteRefreshTokenCookie(HttpResponse response)
     {
-        response.Cookies.Delete("refreshToken", new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict
-        });
+        response.Cookies.Delete(RefreshTokenCookieName, BaseOptions);
     }
 }

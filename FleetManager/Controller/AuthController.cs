@@ -38,16 +38,17 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<AuthResponseDto>> LoginAsync([FromBody] UserRequestDto userRequestDto)
     {
         var user = await _userService.LoginAsync(userRequestDto);
-        //var accessToken = _accessTokenService.CreateAccessToken(user.userId, user.role);
-        var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(user.userId);
+        //var accessToken = _accessTokenService.CreateAccessToken(user.UserId, user.Role);
+        var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(user.UserId);
         CookieHelper.SetRefreshTokenCookie(Response, refreshToken);
 
         return Ok(new AuthResponseDto
         {
-            Message = "Login successful",
-            //AccessToken = accessToken,
-            //ExpiresIn = _jwtSettings.AccessTokenExpirationMinutes * 60
-        });    
+            Message = "Login successful.",
+            User = user.User 
+            //AccessToken = newAccessToken,
+            // ExpiresIn = _jwtSettings.AccessTokenExpirationMinutes * 60
+        }); 
     }
 
     [HttpPost("logout")]
@@ -71,7 +72,7 @@ public class AuthController : ControllerBase
 
         var (newRefreshToken, userId) = await _refreshTokenService.RotateRefreshTokenAsync(oldToken);
         var user = await _userService.GetUserByIdAsync(userId);
-        //var newAccessToken = _accessTokenService.CreateAccessToken(userId, user.Role);
+       // var newAccessToken = _accessTokenService.CreateAccessToken(user.Id,user.Role);
 
         CookieHelper.SetRefreshTokenCookie(Response, newRefreshToken);
         return Ok(new AuthResponseDto {
