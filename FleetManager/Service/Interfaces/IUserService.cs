@@ -7,5 +7,5 @@ public interface IUserService
     Task<List<UserResponseDto>> GetAllUsersAsync();
     Task<UserResponseDto> GetUserByIdAsync(int id);
     Task<UserResponseDto> RegisterAsync(UserRequestDto dto);
-    Task<(int userId, string role)> LoginAsync(UserRequestDto dto);
+    Task<UserLoginResultDto> LoginAsync(UserRequestDto dto);
 }
