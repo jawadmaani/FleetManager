@@ -27,7 +27,7 @@ public class RefreshTokenService:IRefreshTokenService
         _transactionRepository = transactionRepository;
         _tokenHasher = tokenHasher;
     }
-    public async Task<string> CreateRefreshTokenAsync(int userId, bool saveChanges = true)
+    public async Task<string> CreateRefreshTokenAsync(int userId)
     {
         var user = await _userRepository.GetUserByIdAsync(userId);
         if (user == null)
@@ -55,15 +55,15 @@ public class RefreshTokenService:IRefreshTokenService
             };
             await _refreshTokenRepository.CreateAsync(refreshToken);
         }
-        if (saveChanges)
-            await _refreshTokenRepository.SaveAsync();
-
+         
+        await _refreshTokenRepository.SaveAsync();
+        
         return plainToken;
     }
     
-    public async Task<RefreshToken> ValidateRefreshTokenAsync(string plainToken, bool forUpdate = false)
+    public async Task<RefreshToken> ValidateRefreshTokenAsync(string plainRefreshToken, bool forUpdate = false)
     {
-        var hashed = _tokenHasher.HashToken(plainToken);
+        var hashed = _tokenHasher.HashToken(plainRefreshToken);
 
         RefreshToken? storedToken = forUpdate
             ? await _refreshTokenRepository.GetByTokenHashForUpdateAsync(hashed)
@@ -90,27 +90,27 @@ public class RefreshTokenService:IRefreshTokenService
         token.RevokedAt = DateTime.UtcNow;
         await _refreshTokenRepository.SaveAsync();
     }
-    public async Task<(string newRefreshToken, int userId)> RotateRefreshTokenAsync(string oldPlainToken)
+    
+    public async Task<(string newRefreshToken, int userId)> RotateRefreshTokenAsync(string oldPlainRefreshToken)
     {
         await using var transaction = await _transactionRepository.BeginTransactionAsync();
 
         try
         { 
-            var oldToken = await ValidateRefreshTokenAsync(oldPlainToken, forUpdate: true);
-            oldToken.RevokedAt = DateTime.UtcNow;
-            
-            var newPlain = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
-            var newHashed = _tokenHasher.HashToken(newPlain);
+            var oldRefreshToken = await ValidateRefreshTokenAsync(oldPlainRefreshToken, forUpdate: true);
+        
+            var newRefreshTokenPlain = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+            var newHashedRefreshToken = _tokenHasher.HashToken(newRefreshTokenPlain);
 
-            oldToken.RefreshTokenHash = newHashed;
-            oldToken.CreatedAt = DateTime.UtcNow;
-            oldToken.ExpiresAt = DateTime.UtcNow.AddDays(7);
-            oldToken.RevokedAt = null;
+            oldRefreshToken.RefreshTokenHash = newHashedRefreshToken;
+            oldRefreshToken.CreatedAt = DateTime.UtcNow;
+            oldRefreshToken.ExpiresAt = DateTime.UtcNow.AddDays(7);
+            oldRefreshToken.RevokedAt = null;
 
             await _refreshTokenRepository.SaveAsync();
             await _transactionRepository.CommitTransactionAsync();
 
-            return (newPlain, oldToken.UserId);
+            return (newRefreshTokenPlain, oldRefreshToken.UserId);
         }
         catch
         {
@@ -118,6 +118,7 @@ public class RefreshTokenService:IRefreshTokenService
             throw;
         }
     }
+
 
 }
 

@@ -3,6 +3,6 @@ public class AuthResponseDto
 {
     public string Message { get; set; }
     public UserResponseDto? User { get; set; }
-    // public string? AccessToken { get; set; }
-    // public int? ExpiresIn { get; set; }
+    public string? AccessToken { get; set; }
+    public int? ExpiresIn { get; set; }
 }

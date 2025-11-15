@@ -1,5 +1,6 @@
 ﻿using FleetManager.Dto;
 using FleetManager.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FleetManager.Controller
@@ -15,7 +16,8 @@ namespace FleetManager.Controller
         {
             _userService = userService;
         }
-        //[Authorize(Roles = "Admin")]
+        
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<ActionResult<List<UserResponseDto>>> GetAllUsers()
         {
@@ -23,7 +25,7 @@ namespace FleetManager.Controller
             return Ok(users);
         }
 
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id:int}")]
         public async Task<ActionResult<UserResponseDto>> GetUserById(int id)
         {
