@@ -39,6 +39,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection("JwtSettings"));
 
+builder.Services.PostConfigure<JwtSettings>(opts =>
+{
+    opts.PrivateKeyPath = privateKeyPath;
+    opts.PublicKeyPath = publicKeyPath;
+});
+
 
 
 // Data Access

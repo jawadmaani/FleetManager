@@ -5,6 +5,6 @@ namespace FleetManager.Service.Interfaces;
 public interface IAccessTokenService
 {
     string CreateAccessToken(int userId,string role);
-    ClaimsPrincipal  ValidateAccessToken(string accessToken);
+    ClaimsPrincipal?  ValidateAccessToken(string accessToken);
     
 }

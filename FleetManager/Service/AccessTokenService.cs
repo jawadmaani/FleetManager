@@ -13,6 +13,9 @@ public class AccessTokenService:IAccessTokenService
     private readonly JwtSettings _settings;
     private readonly ECDsa _privateKey;
     private readonly ECDsa _publicKey;
+    private readonly JwtSecurityTokenHandler _tokenHandler = new();
+    private readonly TokenValidationParameters _validationParameters;
+    private readonly string _signingAlgorithm;
 
     public AccessTokenService(IOptions<JwtSettings> settings)
     {
@@ -21,37 +24,15 @@ public class AccessTokenService:IAccessTokenService
         _privateKey.ImportFromPem(File.ReadAllText(_settings.PrivateKeyPath));
         _publicKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
         _publicKey.ImportFromPem(File.ReadAllText(_settings.PublicKeyPath));
-    }
-    
-    public string CreateAccessToken(int userId, string role)
-    {
-        var claims = new List<Claim>
+        
+        
+        _signingAlgorithm = _settings.Algorithm?.ToUpperInvariant() switch
         {
-            new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
-            new Claim("role", role),
-            new Claim(JwtRegisteredClaimNames.Iat,
-                new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(),
-                ClaimValueTypes.Integer64)
+            "ES256" => SecurityAlgorithms.EcdsaSha256,
+            _ => throw new NotSupportedException($"Unsupported JWT signing algorithm '{_settings.Algorithm}'.")
         };
 
-        var credentials = new SigningCredentials(new ECDsaSecurityKey(_privateKey), SecurityAlgorithms.EcdsaSha256);
-
-        var token = new JwtSecurityToken(
-            issuer: _settings.Issuer,
-            audience: _settings.Audience,
-            claims: claims,
-            notBefore: DateTime.UtcNow,
-            expires: DateTime.UtcNow.AddMinutes(_settings.AccessTokenExpirationMinutes),
-            signingCredentials: credentials
-        );
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
-    }
-
-    public ClaimsPrincipal? ValidateAccessToken(string accessToken)
-    {
-        
-        var validationParams = new TokenValidationParameters
+        _validationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidIssuer = _settings.Issuer,
@@ -64,19 +45,55 @@ public class AccessTokenService:IAccessTokenService
 
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new ECDsaSecurityKey(_publicKey),
-            
+
             RequireExpirationTime = true,
-            RequireSignedTokens = true
+            RequireSignedTokens = true,
+            NameClaimType = ClaimTypes.NameIdentifier,
+            RoleClaimType = ClaimTypes.Role
         };
+        
+    }
+    
+    public string CreateAccessToken(int userId, string role)
+    {
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+            new Claim(ClaimTypes.Role, role),
+            new Claim(JwtRegisteredClaimNames.Iat,
+                new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(),
+                ClaimValueTypes.Integer64)
+        };
+
+        var credentials = new SigningCredentials(new ECDsaSecurityKey(_privateKey), _signingAlgorithm);
+
+        var token = new JwtSecurityToken(
+            issuer: _settings.Issuer,
+            audience: _settings.Audience,
+            claims: claims,
+            notBefore: DateTime.UtcNow,
+            expires: DateTime.UtcNow.AddMinutes(_settings.AccessTokenExpirationMinutes),
+            signingCredentials: credentials
+        );
+
+        return _tokenHandler.WriteToken(token);
+    }
+
+    public ClaimsPrincipal? ValidateAccessToken(string accessToken)
+    {
         try
         {
-            var principal = new JwtSecurityTokenHandler()
-                .ValidateToken(accessToken, validationParams, out var validatedToken);
-            var jwt = (JwtSecurityToken)validatedToken;
+            var principal = _tokenHandler.ValidateToken(accessToken, _validationParameters, out var validatedToken);
+
+            if (validatedToken is not JwtSecurityToken jwtToken ||
+                !jwtToken.Header.Alg.Equals(_signingAlgorithm, StringComparison.InvariantCultureIgnoreCase))
+            {
+                throw new SecurityTokenException("Invalid token");
+            }
+
             return principal;
-            
         }
-        catch 
+        catch
         {
             return null;
         }
