@@ -4,23 +4,28 @@ using FleetManager.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Options;
 
 namespace FleetManager.Controller;
 
 [ApiController]
-[EnableRateLimiting("auth-limit")]
+//[EnableRateLimiting("auth-limit")]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
     private readonly IUserService _userService;
     private readonly IRefreshTokenService _refreshTokenService;
+    private readonly IAccessTokenService _accessTokenService;
+    private readonly JwtSettings _jwtSettings;
 
 
-    public AuthController(IRefreshTokenService refreshTokenService,IUserService userService)
+    public AuthController(IRefreshTokenService refreshTokenService,IAccessTokenService accessTokenService,IOptions<JwtSettings>jwtSettings,IUserService userService)
     
     {
         _refreshTokenService = refreshTokenService;
         _userService = userService;
+        _accessTokenService = accessTokenService;
+        _jwtSettings = jwtSettings.Value;
        
 
     }
@@ -38,16 +43,16 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<AuthResponseDto>> LoginAsync([FromBody] UserRequestDto userRequestDto)
     {
         var user = await _userService.LoginAsync(userRequestDto);
-        //var accessToken = _accessTokenService.CreateAccessToken(user.UserId, user.Role);
+        var accessToken = _accessTokenService.CreateAccessToken(user.UserId, user.Role);
         var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(user.UserId);
         CookieHelper.SetRefreshTokenCookie(Response, refreshToken);
 
         return Ok(new AuthResponseDto
         {
             Message = "Login successful.",
-            User = user.User 
-            //AccessToken = newAccessToken,
-            // ExpiresIn = _jwtSettings.AccessTokenExpirationMinutes * 60
+            User = user.User,
+            AccessToken = accessToken, 
+            ExpiresIn = _jwtSettings.AccessTokenExpirationMinutes * 60
         }); 
     }
 
@@ -72,13 +77,13 @@ public class AuthController : ControllerBase
 
         var (newRefreshToken, userId) = await _refreshTokenService.RotateRefreshTokenAsync(oldToken);
         var user = await _userService.GetUserByIdAsync(userId);
-       // var newAccessToken = _accessTokenService.CreateAccessToken(user.Id,user.Role);
+        var newAccessToken = _accessTokenService.CreateAccessToken(user.Id, user.Role.ToString());
 
         CookieHelper.SetRefreshTokenCookie(Response, newRefreshToken);
         return Ok(new AuthResponseDto {
             Message = "Token refreshed successfully",
-            //AccessToken = newAccessToken,
-           // ExpiresIn = _jwtSettings.AccessTokenExpirationMinutes * 60
+            AccessToken = newAccessToken,
+           ExpiresIn = _jwtSettings.AccessTokenExpirationMinutes * 60
         });
         
     }

@@ -1,4 +1,5 @@
-﻿using FleetManager.Exception.RefreshTokenExceptions;
+﻿using FleetManager.Exception.AccessTokenExceptions;
+using FleetManager.Exception.RefreshTokenExceptions;
 using FleetManager.Exception.UserExceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
@@ -25,13 +26,19 @@ public class GlobalExceptionHandler : ControllerBase
             return Conflict(new { message = context.Error.Message });
         
         if (context?.Error is RefreshTokenExpiredException)
-            return NotFound(new { message = context.Error.Message });
+            return Unauthorized(new { message = context.Error.Message });
 
         if (context?.Error is RefreshTokenNotFoundException)
-            return Unauthorized(new { message = context.Error.Message });
+            return NotFound(new { message = context.Error.Message });
 
         if (context?.Error is RefreshTokenRevokedException)
             return Conflict(new { message = context.Error.Message });
+        
+        if (context?.Error is InvalidAccessTokenException)
+            return Unauthorized(new { message = context.Error.Message });
+
+        if (context?.Error is MissingAuthorizationHeaderException)
+            return Unauthorized(new { message = context.Error.Message });
       
 
         return StatusCode(500, new { message = "An unexpected error occurred." });
