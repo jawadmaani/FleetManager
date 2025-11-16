@@ -78,6 +78,12 @@ public class VehicleService:IVehicleService
         if (vehicle == null)
             throw new VehicleNotFoundException($"No vehicle found with ID {id}");
 
+        if (!Enum.IsDefined(typeof(Status), newStatus))
+            throw new InvalidStatusException("Invalid status value.");
+
+        if (vehicle.Status == newStatus)
+            throw new VehicleStatusUnchangedException("Vehicle already has this status.");
+
         vehicle.Status = newStatus;
 
         _vehicleRepository.Update(vehicle);
