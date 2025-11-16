@@ -29,13 +29,13 @@ public class RefreshTokenService:IRefreshTokenService
     }
     public async Task<string> CreateRefreshTokenAsync(int userId)
     {
-        var user = await _userRepository.GetUserByIdAsync(userId);
+        var user = await _userRepository.GetByIdAsync(userId);
         if (user == null)
             throw new UserNotFoundException($"User with ID {userId} not found.");
 
         var plainToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
         var hashedToken = _tokenHasher.HashToken(plainToken);
-        var existingToken = await _refreshTokenRepository.GetByUserIdAsync(userId);
+        var existingToken = await _refreshTokenRepository.GetByIdAsync(userId);
 
         if (existingToken != null)
         {
@@ -53,7 +53,7 @@ public class RefreshTokenService:IRefreshTokenService
                 ExpiresAt = DateTime.UtcNow.AddDays(7),
                 CreatedAt = DateTime.UtcNow
             };
-            await _refreshTokenRepository.CreateAsync(refreshToken);
+            await _refreshTokenRepository.AddAsync(refreshToken);
         }
          
         await _refreshTokenRepository.SaveAsync();

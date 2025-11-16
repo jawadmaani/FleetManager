@@ -1,8 +1,8 @@
-﻿namespace FleetManager.Repository;
-
-public interface IRepository<T> where T : class
+﻿public interface IRepository<T> where T : class
 {
-  Task CreateAsync(T entity);
-  Task SaveAsync();
-    
+    Task<T?> GetByIdAsync(int id);
+    Task AddAsync(T entity);
+    void Update(T entity);
+    void Delete(T entity);
+    Task SaveAsync();
 }
