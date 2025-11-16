@@ -31,7 +31,7 @@ public class UserService:IUserService
 
     public async Task<UserResponseDto> GetUserByIdAsync(int id)
     {
-        var user = await _repository.GetUserByIdAsync(id);
+        var user = await _repository.GetByIdAsync(id);
         if (user == null)
             throw new UserNotFoundException($"No user found with ID {id}");
 
@@ -51,7 +51,7 @@ public class UserService:IUserService
             role = UserRole.Viewer
         };
 
-        await _repository.CreateAsync(user);
+        await _repository.AddAsync(user);
         await _repository.SaveAsync();
 
         return UserMapper.ToUserResponseDto(user);

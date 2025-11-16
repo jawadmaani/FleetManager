@@ -1,10 +1,9 @@
 ﻿using FleetManager.Data;
 using FleetManager.Model;
+using FleetManager.Repository;
 using Microsoft.EntityFrameworkCore;
 
-namespace FleetManager.Repository;
-
-public class RefreshTokenRepository: IRefreshTokenRepository
+public class RefreshTokenRepository : IRefreshTokenRepository
 {
     private readonly AppDbContext _context;
 
@@ -12,7 +11,7 @@ public class RefreshTokenRepository: IRefreshTokenRepository
     {
         _context = context;
     }
-    
+
     public async Task<RefreshToken?> GetByTokenHashAsync(string refreshTokenHash)
     {
         return await _context.RefreshTokens
@@ -26,22 +25,34 @@ public class RefreshTokenRepository: IRefreshTokenRepository
             .FirstOrDefaultAsync();
     }
 
+    public async Task<RefreshToken?> GetByIdAsync(int id)
+    {
+        return await _context.RefreshTokens.FindAsync(id);
+    }
+    
     public async Task<RefreshToken?> GetByUserIdAsync(int userId)
     {
         return await _context.RefreshTokens
             .FirstOrDefaultAsync(rt => rt.UserId == userId);
     }
 
-
-    public async Task CreateAsync(RefreshToken entity)
+    public async Task AddAsync(RefreshToken entity)
     {
         await _context.RefreshTokens.AddAsync(entity);
     }
 
+    public void Update(RefreshToken entity)
+    {
+        _context.RefreshTokens.Update(entity);
+    }
+
+    public void Delete(RefreshToken entity)
+    {
+        _context.RefreshTokens.Remove(entity);
+    }
 
     public async Task SaveAsync()
     {
         await _context.SaveChangesAsync();
     }
-    
 }

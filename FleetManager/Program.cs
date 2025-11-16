@@ -51,6 +51,7 @@ builder.Services.PostConfigure<JwtSettings>(opts =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
 
 // Security & Hashing
 builder.Services.AddScoped<ITokenHashStrategy, HmacSha512HashStrategy>();
@@ -61,6 +62,7 @@ builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<IAccessTokenService, AccessTokenService>();
+builder.Services.AddScoped<IVehicleService, VehicleService>();
 
 
 
