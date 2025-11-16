@@ -17,14 +17,14 @@ public class VehicleRepository: IVehicleRepository
     public async Task<IEnumerable<Vehicle>> GetAllVehiclesAsync()
     {
         return await _context.Vehicles.ToListAsync();
-    }   
-    
-     public async Task<Vehicle?> GetVehicleByLicensePlateAsync(string plateNumber)
+    }
+
+     public async Task<bool> PlateNumberExistsAsync(string plateNumber, int? excludeVehicleId = null)
         {
-            return await _context.Vehicles.FirstOrDefaultAsync(v => v.PlateNumber == plateNumber);
+            return await _context.Vehicles.AnyAsync(v => v.PlateNumber == plateNumber && (excludeVehicleId == null || v.Id != excludeVehicleId));
         }
-    
-     public async Task<Vehicle?> GetByIdAsync(int id)
+
+        public async Task<Vehicle?> GetByIdAsync(int id)
     {
         return  await _context.Vehicles.FindAsync(id); 
     }

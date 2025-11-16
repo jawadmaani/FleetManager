@@ -29,6 +29,12 @@ public class RefreshTokenRepository : IRefreshTokenRepository
     {
         return await _context.RefreshTokens.FindAsync(id);
     }
+    
+    public async Task<RefreshToken?> GetByUserIdAsync(int userId)
+    {
+        return await _context.RefreshTokens
+            .FirstOrDefaultAsync(rt => rt.UserId == userId);
+    }
 
     public async Task AddAsync(RefreshToken entity)
     {

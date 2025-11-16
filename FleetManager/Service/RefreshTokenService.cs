@@ -35,7 +35,7 @@ public class RefreshTokenService:IRefreshTokenService
 
         var plainToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
         var hashedToken = _tokenHasher.HashToken(plainToken);
-        var existingToken = await _refreshTokenRepository.GetByIdAsync(userId);
+        var existingToken = await _refreshTokenRepository.GetByUserIdAsync(userId);
 
         if (existingToken != null)
         {
