@@ -3,7 +3,6 @@ using FleetManager.Security;
 using FleetManager.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
 
 namespace FleetManager.Controller;
@@ -11,14 +10,14 @@ namespace FleetManager.Controller;
 [ApiController]
 //[EnableRateLimiting("auth-limit")]
 [Route("api/[controller]")]
+[Produces("application/json")]
 public class AuthController : ControllerBase
 {
     private readonly IUserService _userService;
     private readonly IRefreshTokenService _refreshTokenService;
     private readonly IAccessTokenService _accessTokenService;
     private readonly JwtSettings _jwtSettings;
-
-
+    
     public AuthController(IRefreshTokenService refreshTokenService,IAccessTokenService accessTokenService,IOptions<JwtSettings>jwtSettings,IUserService userService)
     
     {
