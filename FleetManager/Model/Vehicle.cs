@@ -31,4 +31,6 @@ public class Vehicle
     public Status Status { get; set; } = Status.Active;
     
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    
+    public Driver? Driver { get; set; }
 }

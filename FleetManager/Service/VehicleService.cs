@@ -19,9 +19,9 @@ public class VehicleService:IVehicleService
 
     public async Task<IEnumerable<VehicleResponseDto>> GetAllVehiclesAsync()
     {
-        var vehicles = await _vehicleRepository.GetAllVehiclesAsync();
-        if (!vehicles.Any())
-            throw new NoVehicleFoundException("No vehicles found.");
+        var vehicles = await _vehicleRepository.GetAllAsync();
+        if (vehicles == null)
+            throw new NoVehiclesFoundException("No vehicles found.");
 
         return VehicleMapper.ToVehicleResponseDtoList(vehicles);
     }
@@ -43,6 +43,7 @@ public class VehicleService:IVehicleService
 
         
         var newVehicle = VehicleMapper.ToVehicleEntity(vehicle);
+        
         
         await _vehicleRepository.AddAsync(newVehicle);
         await _vehicleRepository.SaveAsync();

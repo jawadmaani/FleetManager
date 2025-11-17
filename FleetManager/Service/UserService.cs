@@ -22,7 +22,7 @@ public class UserService:IUserService
 
     public async Task<List<UserResponseDto>> GetAllUsersAsync()
     {
-        var users = await _repository.GetAllUsersAsync();
+        var users = await _repository.GetAllAsync();
         if (users == null || !users.Any())
             throw new NoUsersFoundException("No users found.");
 
