@@ -117,10 +117,10 @@ public class DriverService: IDriverService
             throw new InvalidOperationException("Vehicle is not active and cannot be assigned to a driver.");
         
         if (driver.VehicleId != null)
-                throw new InvalidOperationException("Driver already has a vehicle assigned.");
+                throw new DriverAlreadyAssignedException("Driver already has a vehicle assigned.");
         
         if (vehicle.Driver != null)
-            throw new InvalidOperationException("Vehicle is already assigned to another driver.");
+            throw new VehicleAlreadyAssignedException("Vehicle is already assigned to another driver.");
         
         driver.VehicleId= vehicleId;
         
