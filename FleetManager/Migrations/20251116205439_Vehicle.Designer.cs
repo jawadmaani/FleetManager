@@ -3,6 +3,7 @@ using System;
 using FleetManager.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FleetManager.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251116205439_Vehicle")]
+    partial class Vehicle
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,54 +24,6 @@ namespace FleetManager.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("FleetManager.Model.Driver", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<string>("LicenseNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("VehicleId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LicenseNumber")
-                        .IsUnique();
-
-                    b.HasIndex("PhoneNumber")
-                        .IsUnique();
-
-                    b.HasIndex("VehicleId")
-                        .IsUnique();
-
-                    b.ToTable("Drivers", (string)null);
-                });
 
             modelBuilder.Entity("FleetManager.Model.RefreshToken", b =>
                 {
@@ -193,16 +148,6 @@ namespace FleetManager.Migrations
                         });
                 });
 
-            modelBuilder.Entity("FleetManager.Model.Driver", b =>
-                {
-                    b.HasOne("FleetManager.Model.Vehicle", "Vehicle")
-                        .WithOne("Driver")
-                        .HasForeignKey("FleetManager.Model.Driver", "VehicleId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Vehicle");
-                });
-
             modelBuilder.Entity("FleetManager.Model.RefreshToken", b =>
                 {
                     b.HasOne("FleetManager.Model.User", "User")
@@ -217,11 +162,6 @@ namespace FleetManager.Migrations
             modelBuilder.Entity("FleetManager.Model.User", b =>
                 {
                     b.Navigation("refreshToken");
-                });
-
-            modelBuilder.Entity("FleetManager.Model.Vehicle", b =>
-                {
-                    b.Navigation("Driver");
                 });
 #pragma warning restore 612, 618
         }

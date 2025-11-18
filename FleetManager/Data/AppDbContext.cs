@@ -12,6 +12,8 @@ public class AppDbContext : DbContext
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
     public DbSet<Vehicle> Vehicles { get; set; } = null!;
+    
+    public DbSet<Driver> Drivers { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -89,7 +91,10 @@ public class AppDbContext : DbContext
 
             
             
-            entity.HasCheckConstraint("CK_Vehicles_Year", "Year >= 1900 AND Year <= 2100");
+            entity.HasCheckConstraint(
+                "CK_Vehicles_Year",
+                "\"Year\" >= 1900 AND \"Year\" <= 2100"
+            );
             
             entity.Property(v => v.FuelType)
                 .HasConversion<string>()   
@@ -103,6 +108,44 @@ public class AppDbContext : DbContext
             entity.Property(v => v.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
+        });
+        
+        modelBuilder.Entity<Driver>(entity =>
+        {
+            entity.ToTable("Drivers");
+
+            entity.Property(d => d.Name)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasColumnType("varchar(100)");
+
+            entity.Property(d => d.LicenseNumber)
+                .IsRequired()
+                .HasMaxLength(50)
+                .HasColumnType("varchar(50)");
+
+            entity.HasIndex(d=> d.LicenseNumber)
+                .IsUnique();
+
+            entity.Property(d => d.PhoneNumber)
+                .IsRequired()
+                .HasMaxLength(20)
+                .HasColumnType("varchar(20)");    
+            
+            // propably change it to non-unique in future
+            entity.HasIndex(p=> p.PhoneNumber)
+                .IsUnique();
+            
+            entity.Property(d => d.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            
+            entity.Property(d=> d.VehicleId)
+                .IsRequired(false);
+            
+            entity.HasOne(d => d.Vehicle)
+                .WithOne(v => v.Driver)
+                .HasForeignKey<Driver>(d => d.VehicleId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
 

@@ -14,9 +14,11 @@ public class VehicleRepository: IVehicleRepository
         _context = context;
     }
     
-    public async Task<IEnumerable<Vehicle>> GetAllVehiclesAsync()
+    public async Task<IEnumerable<Vehicle>> GetAllAsync()
     {
-        return await _context.Vehicles.ToListAsync();
+        return await _context.Vehicles
+            .Include(v => v.Driver).ToListAsync();
+        
     }
 
      public async Task<bool> PlateNumberExistsAsync(string plateNumber, int? excludeVehicleId = null)
@@ -26,7 +28,9 @@ public class VehicleRepository: IVehicleRepository
 
         public async Task<Vehicle?> GetByIdAsync(int id)
     {
-        return  await _context.Vehicles.FindAsync(id); 
+        return await _context.Vehicles
+            .Include(v => v.Driver)
+            .FirstOrDefaultAsync(v => v.Id == id);
     }
     
     
