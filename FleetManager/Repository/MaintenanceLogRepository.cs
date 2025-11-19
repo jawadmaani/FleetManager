@@ -16,7 +16,8 @@ public class MaintenanceLogRepository:IMaintenanceLogRepository
     
     public async Task<IEnumerable<MaintenanceLog>> GetAllAsync()
     {
-        return await _context.MaintenanceLogs.Include(m => m.Vehicle)
+        return await _context.MaintenanceLogs
+            .Include(m => m.Vehicle)
             .Include(m=>m.User)
             .ToListAsync();
     }

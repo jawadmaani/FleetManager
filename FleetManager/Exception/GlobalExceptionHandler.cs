@@ -1,5 +1,6 @@
 ﻿using FleetManager.Exception.AccessTokenExceptions;
 using FleetManager.Exception.DriverExceptions;
+using FleetManager.Exception.MaintenanceLogExceptions;
 using FleetManager.Exception.RefreshTokenExceptions;
 using FleetManager.Exception.UserExceptions;
 using FleetManager.Exception.VehicleExceptions;
@@ -84,7 +85,15 @@ public class GlobalExceptionHandler : ControllerBase
         if (context?.Error is DriverAlreadyExistsException)
             return Conflict(new { message = context.Error.Message });
         
+        
+        // MaintenanceLog Exception 
+        if (context?.Error is MaintenanceLogNotFoundException)
+            return NotFound(new { message = context.Error.Message });
+        
+        if (context?.Error is NoMaintenanceLogFoundException)
+            return NotFound(new { message = context.Error.Message });
 
+     
 
         return StatusCode(500, new { message = "An unexpected error occurred." });
     }

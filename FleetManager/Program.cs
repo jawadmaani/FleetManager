@@ -53,11 +53,14 @@ builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
 builder.Services.AddScoped<IDriverRepository, DriverRepository>();
+builder.Services.AddScoped<IMaintenanceLogRepository, MaintenanceLogRepository>();
 
 // Security & Hashing 
 builder.Services.AddScoped<ITokenHashStrategy, HmacSha512HashStrategy>();
 builder.Services.AddSingleton(new TokenHasher(refreshSecret, new HmacSha512HashStrategy()));
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
+builder.Services.AddHttpContextAccessor();
+
 
 // Services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -65,6 +68,7 @@ builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<IAccessTokenService, AccessTokenService>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddScoped<IDriverService, DriverService>();
+builder.Services.AddScoped<IMaintenanceLogService, MaintenanceLogService>();
 
 
 builder.Services.AddEndpointsApiExplorer();
