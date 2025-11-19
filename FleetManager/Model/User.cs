@@ -24,5 +24,6 @@ public class User
 
     public RefreshToken? refreshToken { get; set; }
     
+    public ICollection<MaintenanceLog> MaintenanceLogs { get; set; } = new List<MaintenanceLog>();
     
 }

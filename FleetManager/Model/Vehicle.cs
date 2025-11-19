@@ -33,4 +33,7 @@ public class Vehicle
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
     public Driver? Driver { get; set; }
+    
+    public ICollection<MaintenanceLog> MaintenanceLogs { get; set; } = new List<MaintenanceLog>();
+    
 }
