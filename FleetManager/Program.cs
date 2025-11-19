@@ -59,6 +59,8 @@ builder.Services.AddScoped<IMaintenanceLogRepository, MaintenanceLogRepository>(
 builder.Services.AddScoped<ITokenHashStrategy, HmacSha512HashStrategy>();
 builder.Services.AddSingleton(new TokenHasher(refreshSecret, new HmacSha512HashStrategy()));
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
+builder.Services.AddHttpContextAccessor();
+
 
 // Services
 builder.Services.AddScoped<IUserService, UserService>();

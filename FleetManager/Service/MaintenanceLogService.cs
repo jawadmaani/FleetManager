@@ -41,6 +41,10 @@ public class MaintenanceLogService : IMaintenanceLogService
 
     public async Task<IEnumerable<MaintenanceLogResponseDto>> GetMaintenanceLogsByVehicleIdAsync(int vehicleId)
     {
+        var vehicle = await _vehicleRepository.GetByIdAsync(vehicleId);
+        if (vehicle == null)
+            throw new VehicleNotFoundException($"No vehicle found with ID {vehicleId}");
+
         var logs = await _maintenanceLogRepository.GetByVehicleIdAsync(vehicleId);
         return MaintenanceLogMapper.ToMaintenanceLogResponseDtoList(logs);
     }
