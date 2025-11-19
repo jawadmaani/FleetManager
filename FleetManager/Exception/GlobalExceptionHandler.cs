@@ -1,4 +1,5 @@
 ﻿using FleetManager.Exception.AccessTokenExceptions;
+using FleetManager.Exception.DriverExceptions;
 using FleetManager.Exception.RefreshTokenExceptions;
 using FleetManager.Exception.UserExceptions;
 using FleetManager.Exception.VehicleExceptions;
@@ -50,6 +51,9 @@ public class GlobalExceptionHandler : ControllerBase
         //  Vehicle Exceptions 
         if (context?.Error is VehicleNotFoundException)
             return NotFound(new { message = context.Error.Message });
+        
+        if (context?.Error is NoVehiclesFoundException)
+            return NotFound(new { message = context.Error.Message });
       
         if (context?.Error is InvalidStatusException)
             return BadRequest(new { message = context.Error.Message });
@@ -60,7 +64,26 @@ public class GlobalExceptionHandler : ControllerBase
         if (context?.Error is VehicleStatusUnchangedException)
             return Conflict(new { message = context.Error.Message });
         
-     
+        if (context?.Error is VehicleAlreadyAssignedException)
+            return Conflict(new { message = context.Error.Message });
+        
+        
+        // Driver Exceptions
+        if (context?.Error is DriverNotFoundException)
+            return NotFound(new { message = context.Error.Message });
+        
+        if (context?.Error is NoDriversFoundException)
+            return NotFound(new { message = context.Error.Message });
+        
+        if (context?.Error is DriverStatusUnchangedException)
+            return Conflict(new { message = context.Error.Message });
+        
+        if (context?.Error is DriverAlreadyAssignedException)
+            return Conflict(new { message = context.Error.Message });
+        
+        if (context?.Error is DriverAlreadyExistsException)
+            return Conflict(new { message = context.Error.Message });
+        
 
 
         return StatusCode(500, new { message = "An unexpected error occurred." });
