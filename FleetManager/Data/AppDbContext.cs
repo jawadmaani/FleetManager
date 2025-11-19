@@ -14,6 +14,8 @@ public class AppDbContext : DbContext
     public DbSet<Vehicle> Vehicles { get; set; } = null!;
     
     public DbSet<Driver> Drivers { get; set; } = null!;
+    
+    public DbSet<MaintenanceLog> MaintenanceLogs { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -148,6 +150,45 @@ public class AppDbContext : DbContext
                 .OnDelete(DeleteBehavior.SetNull);
         });
 
+        modelBuilder.Entity<MaintenanceLog>(entity =>
+        {
+            entity.ToTable("MaintenanceLogs");
+
+           entity.Property(ml=>ml.MaintenanceType)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasColumnType("varchar(100)");
+
+           entity.Property(ml => ml.MaintenanceDate)
+               .IsRequired();
+           
+           entity.Property(ml => ml.Cost)
+               .IsRequired()
+               .HasColumnType("decimal(18,2)");
+              
+           entity.Property(ml=>ml.Description)
+               .HasMaxLength(500)
+               .HasColumnType("varchar(500)");
+           
+           
+           entity.Property(ml=>ml.PerformedBy)
+               .IsRequired()
+               .HasMaxLength(100)
+               .HasColumnType("varchar(100)");
+              
+            entity.Property(ml => ml.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            
+            entity.HasOne(ml => ml.Vehicle)
+                .WithMany(v => v.MaintenanceLogs)
+                .HasForeignKey(ml => ml.VehicleId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(ml => ml.User)
+                .WithMany(u => u.MaintenanceLogs)
+                .HasForeignKey(ml => ml.CreatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
 
     }
 }
