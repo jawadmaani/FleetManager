@@ -54,6 +54,7 @@ builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
 builder.Services.AddScoped<IDriverRepository, DriverRepository>();
 builder.Services.AddScoped<IMaintenanceLogRepository, MaintenanceLogRepository>();
+builder.Services.AddScoped<IMaintenanceReportRepository, MaintenanceReportRepository>();
 
 // Security & Hashing 
 builder.Services.AddScoped<ITokenHashStrategy, HmacSha512HashStrategy>();
@@ -69,6 +70,8 @@ builder.Services.AddScoped<IAccessTokenService, AccessTokenService>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddScoped<IDriverService, DriverService>();
 builder.Services.AddScoped<IMaintenanceLogService, MaintenanceLogService>();
+builder.Services.AddScoped<IMaintenanceReportService, MaintenanceReportService>();
+
 
 
 builder.Services.AddEndpointsApiExplorer();
