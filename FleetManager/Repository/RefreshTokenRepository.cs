@@ -27,9 +27,11 @@ public class RefreshTokenRepository : IRefreshTokenRepository
 
     public async Task<IEnumerable<RefreshToken>> GetAllAsync()
     {
-        return await _context.RefreshTokens.ToListAsync();
-        
+        return await _context.RefreshTokens
+            .AsNoTracking()
+            .ToListAsync();
     }
+
 
     public async Task<RefreshToken?> GetByIdAsync(int id)
     {

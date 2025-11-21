@@ -16,13 +16,19 @@ public class DriverRepository:IDriverRepository
 
     public async Task<IEnumerable<Driver>> GetAllAsync()
     {
-        return await _context.Drivers.Include(d=>d.Vehicle).ToListAsync();
+        return await _context.Drivers
+            .AsNoTracking()
+            .Include(d=>d.Vehicle)
+            .ToListAsync();
         
     }
 
     public async Task<Driver?> GetByIdAsync(int id)
     {
-        return await _context.Drivers.Include(d=>d.Vehicle).FirstOrDefaultAsync(d => d.Id == id);
+        return await _context.Drivers
+            .AsNoTracking()
+            .Include(d=>d.Vehicle)
+            .FirstOrDefaultAsync(d => d.Id == id);
     }
 
 

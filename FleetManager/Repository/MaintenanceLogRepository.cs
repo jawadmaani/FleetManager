@@ -17,20 +17,24 @@ public class MaintenanceLogRepository:IMaintenanceLogRepository
     public async Task<IEnumerable<MaintenanceLog>> GetAllAsync()
     {
         return await _context.MaintenanceLogs
+            .AsNoTracking()
             .Include(m => m.Vehicle)
-            .Include(m=>m.User)
+            .Include(m => m.User)
             .ToListAsync();
     }
+
     
     
     public async Task<IEnumerable<MaintenanceLog>> GetByVehicleIdAsync(int vehicleId)
     {
         return await _context.MaintenanceLogs
+            .AsNoTracking()
             .Include(m => m.Vehicle)
-            .Include(m=>m.User)
-            .Where(m=>m.VehicleId == vehicleId)
+            .Include(m => m.User)
+            .Where(m => m.VehicleId == vehicleId)
             .ToListAsync();
     }
+
     
     public async Task<MaintenanceLog?> GetByIdAsync(int id)
     {
