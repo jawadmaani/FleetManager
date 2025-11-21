@@ -31,6 +31,9 @@ public class MaintenanceReportController:ControllerBase
     [HttpGet("top-vehicles")]
     public async Task<ActionResult<List<VehicleTotalCostResult>>> GetTopVehiclesByMaintenanceCostAsync([FromQuery] int top = 3)
     {
+        if (top <= 0)
+            return BadRequest("Parameter 'top' must be greater than 0.");
+        
         var topVehicles  = await _maintenanceReportService.GetTopVehiclesByMaintenanceCostAsync(top);
         return Ok(topVehicles);
     }

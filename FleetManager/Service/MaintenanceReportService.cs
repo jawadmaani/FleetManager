@@ -21,7 +21,7 @@ public class MaintenanceReportService:IMaintenanceReportService
 
     public async Task<IEnumerable<VehicleTotalCostResult>> GetTopVehiclesByMaintenanceCostAsync(int top = 3)
     {
-        return await _maintenanceReportRepository.GetTopVehiclesByMaintenanceCostAsync(3);
+        return await _maintenanceReportRepository.GetTopVehiclesByMaintenanceCostAsync(top);
     }
 
     public async Task<IEnumerable<MonthlyTotalCostResult>> GetMonthlyTotalMaintenanceCostAsync()
