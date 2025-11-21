@@ -38,8 +38,8 @@ public class MaintenanceLogController:ControllerBase
     [HttpGet("vehicle/{vehicleId:int}")]
     public async Task<ActionResult<List<MaintenanceLogResponseDto>>> GetMaintenanceLogsByVehicleIdAsync(int vehicleId)
     {
-        var maintenanceLog = await _maintenanceLogService.GetMaintenanceLogsByVehicleIdAsync(vehicleId);
-        return Ok(maintenanceLog);
+        var maintenanceLogs = await _maintenanceLogService.GetMaintenanceLogsByVehicleIdAsync(vehicleId);
+        return Ok(maintenanceLogs);
     }
 
     [Authorize(Roles = "Admin,Mechanic")]
