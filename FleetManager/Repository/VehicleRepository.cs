@@ -30,7 +30,6 @@ public class VehicleRepository: IVehicleRepository
         public async Task<Vehicle?> GetByIdAsync(int id)
     {
         return await _context.Vehicles
-            .AsNoTracking()
             .Include(v => v.Driver)
             .FirstOrDefaultAsync(v => v.Id == id);
 

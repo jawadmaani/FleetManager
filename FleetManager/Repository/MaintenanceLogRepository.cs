@@ -39,7 +39,6 @@ public class MaintenanceLogRepository:IMaintenanceLogRepository
     public async Task<MaintenanceLog?> GetByIdAsync(int id)
     {
         return await _context.MaintenanceLogs
-            .AsNoTracking()
             .Include(m => m.Vehicle)
             .Include(m=>m.User)
             .FirstOrDefaultAsync(m => m.Id == id);
