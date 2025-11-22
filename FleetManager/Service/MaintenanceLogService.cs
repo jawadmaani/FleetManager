@@ -52,6 +52,9 @@ public class MaintenanceLogService : IMaintenanceLogService
 
     public async Task<MaintenanceLogResponseDto> CreateMaintenanceLogAsync(MaintenanceLogRequestDto maintenanceLog)
     {
+        if (maintenanceLog.Cost <= 0)
+            throw new InvalidMaintenanceLogCostException("Cost must be greater than zero.");
+        
         var vehicle = await _vehicleRepository.GetByIdAsync(maintenanceLog.VehicleId);
         if (vehicle == null)
             throw new VehicleNotFoundException($"No vehicle found with ID {maintenanceLog.VehicleId}");
@@ -70,6 +73,10 @@ public class MaintenanceLogService : IMaintenanceLogService
 
     public async Task<MaintenanceLogResponseDto> UpdateMaintenanceLogAsync(int id, MaintenanceLogUpdateDto updatedMaintenanceLog)
     {
+        
+        if (updatedMaintenanceLog.Cost <= 0)
+            throw new InvalidMaintenanceLogCostException("Cost must be greater than zero.");
+        
         var maintenanceLog = await _maintenanceLogRepository.GetByIdAsync(id);
         if (maintenanceLog == null)
             throw new MaintenanceLogNotFoundException($"No maintenance log found with ID {id}");

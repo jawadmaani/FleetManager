@@ -7,6 +7,7 @@ using FleetManager.Repository.Interfaces;
 using FleetManager.Security;
 using FleetManager.Service;
 using FleetManager.Service.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -46,6 +47,15 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.PropertyNamingPolicy = null;
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = false;
+});
+
+
+
+
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
