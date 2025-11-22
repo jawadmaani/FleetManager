@@ -98,7 +98,7 @@ public class GlobalExceptionHandler : ControllerBase
             return NotFound(new { message = context.Error.Message });
 
         if (context?.Error is InvalidMaintenanceLogCostException)
-            return Conflict(new { message = context.Error.Message });
+            return BadRequest(new { message = context.Error.Message });
      
 
         return StatusCode(500, new { message = "An unexpected error occurred." });

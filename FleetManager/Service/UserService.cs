@@ -4,6 +4,7 @@ using FleetManager.Mapper;
 using FleetManager.Model;
 using FleetManager.Model.Enums;
 using FleetManager.Repository;
+using FleetManager.Repository.Interfaces;
 using FleetManager.Security;
 using FleetManager.Service.Interfaces;
 
@@ -13,10 +14,12 @@ public class UserService:IUserService
 {
     private readonly IUserRepository _repository;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly IMaintenanceLogRepository _maintenanceLogRepository;
     
-    public UserService(IUserRepository repository, IPasswordHasher passwordHasher)
+    public UserService(IUserRepository repository,IMaintenanceLogRepository maintenanceLogRepository ,IPasswordHasher passwordHasher)
     {
         _repository = repository;
+        _maintenanceLogRepository = maintenanceLogRepository;
         _passwordHasher = passwordHasher;
     }
 
@@ -72,5 +75,45 @@ public class UserService:IUserService
             UserId = user.Id,
             Role = user.role.ToString(),
             User = UserMapper.ToUserResponseDto(user)
-        };    }
+        }; 
+        
+    }
+    
+  
+    public async Task<UserResponseDto> UpdateUserAsync(int id, UserUpdateDto dto)
+    {
+        var user = await _repository.GetByIdAsync(id);
+        if (user == null)
+            throw new UserNotFoundException($"No user found with ID {id}");
+
+        var existing = await _repository.GetUserByUsernameAsync(dto.Username);
+        if (existing != null && existing.Id != id)
+            throw new UserAlreadyExistsException("Username already exists");
+
+        user.Username = dto.Username;
+        user.passwordHash = _passwordHasher.HashPassword(dto.Password);
+        user.role = dto.Role;
+
+        _repository.Update(user);
+        await _repository.SaveAsync();
+
+        return UserMapper.ToUserResponseDto(user);
+    }
+
+    public async Task DeleteUserAsync(int id)
+    {
+        var user = await _repository.GetByIdAsync(id);
+        if (user == null)
+            throw new UserNotFoundException($"No user found with ID {id}");
+
+        var hasLogs = await _maintenanceLogRepository.AnyAsyncByUserId(id);
+        if (hasLogs)
+            throw new UserDeletionNotAllowedException("User cannot be deleted because they have maintenance logs assigned.");
+
+        _repository.Delete(user);
+        await _repository.SaveAsync();
+    }
+    
+    
 }
+
