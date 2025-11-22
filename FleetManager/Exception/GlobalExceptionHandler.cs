@@ -29,6 +29,10 @@ public class GlobalExceptionHandler : ControllerBase
         if (context?.Error is UserAlreadyExistsException)
             return Conflict(new { message = context.Error.Message });
         
+        if (context?.Error is UserDeletionNotAllowedException)
+            return Conflict(new { message = context.Error.Message });
+        
+        
         
         // Refresh Token Exceptions
         if (context?.Error is RefreshTokenExpiredException)
@@ -93,6 +97,8 @@ public class GlobalExceptionHandler : ControllerBase
         if (context?.Error is NoMaintenanceLogFoundException)
             return NotFound(new { message = context.Error.Message });
 
+        if (context?.Error is InvalidMaintenanceLogCostException)
+            return Conflict(new { message = context.Error.Message });
      
 
         return StatusCode(500, new { message = "An unexpected error occurred." });

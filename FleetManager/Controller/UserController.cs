@@ -19,7 +19,7 @@ namespace FleetManager.Controller
         
         [Authorize(Roles = "Admin")]
         [HttpGet]
-        public async Task<ActionResult<List<UserResponseDto>>> GetAllUsers()
+        public async Task<ActionResult<List<UserResponseDto>>> GetAllUsersAsync()
         {
             var users = await _userService.GetAllUsersAsync();
             return Ok(users);
@@ -27,12 +27,28 @@ namespace FleetManager.Controller
 
         [Authorize(Roles = "Admin")]
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<UserResponseDto>> GetUserById(int id)
+        public async Task<ActionResult<UserResponseDto>> GetUserByIdAsync(int id)
         {
             var user = await _userService.GetUserByIdAsync(id);
             return Ok(user);
         }
+        
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult<UserResponseDto>> UpdateUserAsync(int id, UserUpdateDto userUpdateDto)
+        {
+            var user = await _userService.UpdateUserAsync(id, userUpdateDto);
+            return Ok(user);
+        }
 
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> DeleteUserAsync(int id)
+        {
+             await _userService.DeleteUserAsync(id);
+             return NoContent();
+
+        }
         
     }
 }

@@ -35,7 +35,14 @@ public class MaintenanceLogRepository:IMaintenanceLogRepository
             .ToListAsync();
     }
 
-    
+    public async Task<bool> AnyAsyncByUserId(int userId)
+    {
+        return await _context.MaintenanceLogs
+            .AsNoTracking()
+            .AnyAsync(m => m.CreatedByUserId == userId);
+    }
+
+
     public async Task<MaintenanceLog?> GetByIdAsync(int id)
     {
         return await _context.MaintenanceLogs
