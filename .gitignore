@@ -1,0 +1,53 @@
+# Build & runtime artifacts
+bin/
+obj/
+out/
+*.exe
+*.dll
+*.pdb
+*.db
+
+# User-specific files
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.*
+secrets.json
+
+# Dependency caches
+node_modules/
+packages/
+*.nupkg
+
+# OS-specific junk
+.DS_Store
+Thumbs.db
+
+# EF Core migrations snapshots
+*Migrations/*
+!Migrations/*.cs
+!Migrations/*.Designer.cs
+
+# Docker
+docker-compose.override.yml
+.docker/
+
+# Rider settings
+/.idea/
+.idea/
+
+# Publish output
+publish/
+dist/
+wwwroot/
