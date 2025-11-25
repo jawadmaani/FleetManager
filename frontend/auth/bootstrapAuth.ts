@@ -7,9 +7,13 @@ export async function bootstrapAuth() {
     useAuthStore.getState();
 
   try {
-
     if (accessToken) {
       const me = await fetchCurrentUser();
+      if (!me) {
+        clearAuth();
+        return;
+      }
+
       setUser(me);
       return;
     }
@@ -26,6 +30,12 @@ export async function bootstrapAuth() {
     setAccessToken(newToken);
 
     const meResponse = await api.get("/auth/me");
+
+    if (!meResponse.data) {
+      clearAuth();
+      return;
+    }
+  
     setUser(meResponse.data);
   } catch {
     clearAuth();

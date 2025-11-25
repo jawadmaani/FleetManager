@@ -61,9 +61,15 @@ api.interceptors.response.use(
 
         try {
           const meResponse = await api.get("/auth/me");
-          if (meResponse.data) {
-            setUser(meResponse.data);
+          if (!meResponse.data) {
+            clearAuth();
+            if (typeof window !== "undefined") {
+              window.location.href = "/login";
+            }
+            return Promise.reject(error);
           }
+
+          setUser(meResponse.data);
         } catch {
           clearAuth();
           if (typeof window !== "undefined") {
