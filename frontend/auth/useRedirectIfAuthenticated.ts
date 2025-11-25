@@ -6,11 +6,12 @@ import { useRouter } from "next/navigation";
 
 export function useRedirectIfAuthenticated() {
   const user = useAuthStore((s) => s.user);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
   const router = useRouter();
 
   useEffect(() => {
-    if (user) {
+    if (isInitialized && user) {
       router.replace("/dashboard");
     }
-  }, [user, router]);
+  }, [user, router, isInitialized]);
 }

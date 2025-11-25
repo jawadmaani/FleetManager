@@ -4,18 +4,25 @@ import { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { bootstrapAuth } from "../auth/bootstrapAuth";
 import { usePathname } from "next/navigation";
+import { useAuthStore } from "@/auth/authStore";
 import "./globals.css";
 
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const queryClient = new QueryClient();
   const pathname = usePathname();
+  const markInitialized = useAuthStore((s) => s.markInitialized);
 
-useEffect(() => {
+  useEffect(() => {
     if (pathname !== "/login" && pathname !== "/register") {
       bootstrapAuth();
+      return;
     }
-  }, [pathname]);
+    markInitialized();
+  }, [pathname, markInitialized]);
 
   return (
     <html lang="en">

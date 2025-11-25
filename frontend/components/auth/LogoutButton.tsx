@@ -9,13 +9,17 @@ export function LogoutButton() {
   const router = useRouter();
 
   async function handleLogout() {
-    await logout();
-    clearAuth();
-    router.push("/login");
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout failed", error);
+    } finally {
+      clearAuth();
+      router.push("/login");
+    }
   }
-
   return (
-    <button 
+    <button
       onClick={handleLogout}
       className="px-4 py-2 text-sm bg-red-500 text-white rounded-md"
     >

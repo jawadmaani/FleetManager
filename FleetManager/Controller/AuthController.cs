@@ -1,4 +1,5 @@
-﻿using FleetManager.Dto;
+﻿using System.Security.Claims;
+using FleetManager.Dto;
 using FleetManager.Security;
 using FleetManager.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -86,6 +87,23 @@ public class AuthController : ControllerBase
         });
         
     }
+    
+    
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<ActionResult<UserResponseDto>> MeAsync()
+    {
+        var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+            return Unauthorized(new { message = "Invalid access token" });
+
+        if (!int.TryParse(userIdClaim.Value, out var userId))
+            return Unauthorized(new { message = "Invalid user id in token" });
+
+        var user = await _userService.GetUserByIdAsync(userId);
+        return Ok(user);
+    }
+
     
     
 }

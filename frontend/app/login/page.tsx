@@ -9,6 +9,7 @@ import { useState } from "react";
 import { loginSchema, LoginSchema } from "@/lib/validation/auth/loginSchema";
 import { useAuthStore } from "@/auth/authStore";
 import { useRedirectIfAuthenticated } from "@/auth/useRedirectIfAuthenticated";
+import Link from "next/link";
 
 export default function LoginPage() {
   useRedirectIfAuthenticated();
@@ -37,13 +38,19 @@ export default function LoginPage() {
         password: data.password,
       });
 
-      setToken(accessToken);
-      setUser(user);
-
-      router.push("/dashboard");
-    } catch (error) {
+      if (accessToken) {
+        setToken(accessToken);
+      }
+      if (user) {
+        setUser(user);
+      }
+      router.replace("/dashboard");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.error("Login error:", error);
-      setErrorMessage("Invalid username or password");
+      const message =
+        error.response?.data?.message || "Invalid username or password";
+      setErrorMessage(message);
     } finally {
       setLoading(false);
     }
@@ -105,9 +112,9 @@ export default function LoginPage() {
       </button>
       <div className="text-center text-sm mt-4">
         Do not have an account?{" "}
-        <a href="/register" className="text-blue-600 hover:underline">
+        <Link href="/register" className="text-blue-600 hover:underline">
           Register
-        </a>
+        </Link>
       </div>
     </form>
   );

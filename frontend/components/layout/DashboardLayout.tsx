@@ -2,12 +2,20 @@
 
 import { useAuthGuard } from "@/auth/useAuthGuard";
 import { LogoutButton } from "@/components/auth/LogoutButton";
-import { useAuthStore } from "@/auth/authStore";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const user = useAuthGuard();
+  const { user, isLoading } = useAuthGuard();
   const username = user?.username;
   const role = user?.role;
+
+ if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Loading session...</p>
+      </div>
+    );
+  }
+
 
   if (!user) return null;
 

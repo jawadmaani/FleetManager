@@ -6,13 +6,14 @@ import { useRouter } from "next/navigation";
 
 export function useAuthGuard() {
   const user = useAuthStore((s) => s.user);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
   const router = useRouter();
 
   useEffect(() => {
-    if (!user) {
-      router.push("/login");
+    if (isInitialized && !user) {
+      router.replace("/login");
     }
-  }, [user, router]);
+  }, [user, router, isInitialized]);
 
-  return user;
+  return { user, isLoading: !isInitialized };
 }

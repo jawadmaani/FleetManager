@@ -10,6 +10,7 @@ import { registerUser } from "@/lib/api/authApi";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useRedirectIfAuthenticated } from "@/auth/useRedirectIfAuthenticated";
+import Link from "next/link";
 
 export default function RegisterPage() {
   useRedirectIfAuthenticated();
@@ -35,7 +36,8 @@ export default function RegisterPage() {
     try {
       const response = await registerUser(data);
 
-      setSuccessMessage(response.Message);
+      const message = response.Message ?? response.message ?? "Registered";
+      setSuccessMessage(message);
 
       setTimeout(() => {
         router.push("/login");
@@ -104,9 +106,10 @@ export default function RegisterPage() {
 
       <div className="text-center text-sm mt-4">
         Already have an account?{" "}
-        <a href="/login" className="text-blue-600 hover:underline">
+        <Link href="/login" className="text-blue-600 hover:underline">
+          {" "}
           Login
-        </a>
+        </Link>
       </div>
     </form>
   );
