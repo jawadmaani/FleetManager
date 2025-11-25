@@ -7,16 +7,7 @@ export async function bootstrapAuth() {
     useAuthStore.getState();
 
   try {
-    if (accessToken) {
-      const me = await fetchCurrentUser();
-      if (!me) {
-        clearAuth();
-        return;
-      }
-
-      setUser(me);
-      return;
-    }
+  
 
     const refreshResponse = await api.post("/auth/refresh", {});
     const newToken =
