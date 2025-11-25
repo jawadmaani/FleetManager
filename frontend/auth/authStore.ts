@@ -1,10 +1,10 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
-interface User {
-  id: number;
-  username: string;
-  role: string;
+export interface User {
+  Id: number;
+  Username: string;
+  Role: string;
 }
 
 interface AuthState {

@@ -7,7 +7,7 @@ export function RoleGate({ roles, children }: { roles: Role[], children: React.R
   const user = useAuthStore((s) => s.user);
 
   if (!user) return null;
-  if (!userHasRole(user.role, roles)) return null;
+  if (!userHasRole(user.Role, roles)) return null;
 
   return <>{children}</>;
 }
