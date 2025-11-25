@@ -6,16 +6,27 @@ export interface LoginRequest {
   password: string;
 }
 
+export async function fetchCurrentUser() {
+  const response = await api.get("/auth/me");
+  return response.data;
+}
+
 export async function login(data: LoginRequest) {
   const response = await api.post("/auth/login", data);
 
   const accessToken = response.data.AccessToken;
-  const user = response.data.User;
+  let user = response.data.User;
 
   if (accessToken) {
-    useAuthStore.getState().setAccessToken(accessToken);
-  }
-  if (user) {
+    try {
+      user = await fetchCurrentUser();
+      useAuthStore.getState().setUser(user);
+    } catch {
+      if (user) {
+        useAuthStore.getState().setUser(user);
+      }
+    }
+  } else if (user) {
     useAuthStore.getState().setUser(user);
   }
 

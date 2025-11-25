@@ -1,19 +1,25 @@
 import { api } from "@/lib/api/apiClient";
 import { useAuthStore } from "@/auth/authStore";
+import { fetchCurrentUser } from "@/lib/api/authApi";
 
 export async function bootstrapAuth() {
-  const { setAccessToken, setUser, clearAuth, markInitialized } =
+  const { accessToken, setAccessToken, setUser, clearAuth, markInitialized } =
     useAuthStore.getState();
 
   try {
-    // 1) أولاً: محاولة تحديث الـ Access Token
+
+    if (accessToken) {
+      const me = await fetchCurrentUser();
+      setUser(me);
+      return;
+    }
+
     const refreshResponse = await api.post("/auth/refresh", {});
     const newToken =
       refreshResponse.data.AccessToken ?? refreshResponse.data.accessToken;
 
     if (!newToken) {
       clearAuth();
-      markInitialized();
       return;
     }
 

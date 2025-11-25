@@ -19,18 +19,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-api.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().accessToken;
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return config;
-});
-
-
-
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -77,12 +65,15 @@ api.interceptors.response.use(
             setUser(meResponse.data);
           }
         } catch {
-
+          clearAuth();
+          if (typeof window !== "undefined") {
+            window.location.href = "/login";
+          }
+          return Promise.reject(error);
         }
 
         return api(originalRequest);
       } catch (refreshError) {
-
         clearAuth();
         if (typeof window !== "undefined") {
           window.location.href = "/login";
