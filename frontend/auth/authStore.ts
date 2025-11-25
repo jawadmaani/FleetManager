@@ -1,13 +1,10 @@
-"use client";
-
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { devtools } from "zustand/middleware";
 
 interface User {
   id: number;
   username: string;
   role: string;
-  createdAt?: string;
 }
 
 interface AuthState {
@@ -22,7 +19,7 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>()(
-  persist(
+  devtools(
     (set) => ({
       user: null,
       accessToken: null,
@@ -39,13 +36,6 @@ export const useAuthStore = create<AuthState>()(
 
       markInitialized: () => set({ isInitialized: true }),
     }),
-    {
-      name: "auth-storage",
-      storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
-        user: state.user,
-        accessToken: state.accessToken,
-      }),
-    }
+    { name: "AuthStore" }
   )
 );
