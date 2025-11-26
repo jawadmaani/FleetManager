@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getVehicles,
@@ -13,11 +13,23 @@ import EditVehicleDialog from "@/components/vehicles/EditVehicleDialog";
 import DeleteVehicleModal from "@/components/vehicles/DeleteVehicleModal";
 import CreateVehicleDialog from "@/components/vehicles/CreateVehicleDialog";
 
+import StatusToggle from "@/components/common/StatusToggle";
+import StatusFilter from "@/components/common/StatusFilter";
+import SearchBar from "@/components/common/SearchBar";
+import StatsCards from "@/components/common/StatsCards";
+
 import { EditIcon } from "@/components/ui/EditIcon";
 import { DeleteIcon } from "@/components/ui/DeleteIcon";
 
-import StatusToggle from "@/components/common/StatusToggle";
 import { useAuthStore } from "@/auth/authStore";
+
+function formatDate(dateString: string) {
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
 
 export default function VehiclesPage() {
   const queryClient = useQueryClient();
@@ -38,6 +50,11 @@ export default function VehiclesPage() {
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [openCreate, setOpenCreate] = useState(false);
+
+  const [statusFilter, setStatusFilter] = useState<
+    "All" | "Active" | "Inactive"
+  >("All");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteVehicle(id),
@@ -71,98 +88,185 @@ export default function VehiclesPage() {
     queryClient.invalidateQueries({ queryKey: ["vehicles"] });
   }
 
-  if (isLoading) return <p>Loading vehicles...</p>;
-  if (error) return <p>Error loading vehicles</p>;
+  const stats = useMemo(
+    () => ({
+      total: data?.length ?? 0,
+      active: data?.filter((v) => v.Status === "Active").length ?? 0,
+      inactive: data?.filter((v) => v.Status === "Inactive").length ?? 0,
+    }),
+    [data]
+  );
+
+  const filteredVehicles = useMemo(() => {
+    if (!data) return [];
+
+    const lowerSearch = searchTerm.trim().toLowerCase();
+
+    return data
+      .filter((vehicle) => {
+        const matchesSearch =
+          `${vehicle.PlateNumber} ${vehicle.Model} ${vehicle.Manufacturer}`
+            .toLowerCase()
+            .includes(lowerSearch);
+
+        const matchesStatus =
+          statusFilter === "All" || vehicle.Status === statusFilter;
+
+        return matchesSearch && matchesStatus;
+      })
+      .sort((a, b) => a.PlateNumber.localeCompare(b.PlateNumber));
+  }, [data, searchTerm, statusFilter]);
+
+  if (isLoading)
+    return <p className="text-gray-600">Loading vehicles, please wait...</p>;
+  if (error)
+    return (
+      <p className="text-red-600">Unable to load vehicles. Please try again.</p>
+    );
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-xl font-semibold">Vehicles</h1>
-
-        {canCreate && (
-          <button
-            onClick={() => setOpenCreate(true)}
-            className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-900"
-          >
-            Add Vehicle
-          </button>
-        )}
+    <div className="space-y-6 mt-2">
+      <div className="flex items-center justify-between mt-1">
+        <StatsCards
+          total={stats.total}
+          active={stats.active}
+          inactive={stats.inactive}
+        />
       </div>
 
-      <div className="overflow-x-auto rounded-lg border bg-white shadow">
-        <table className="w-full border-collapse text-left">
-          <thead className="bg-gray-100 border-b">
-            <tr>
-              <th className="p-3 text-sm font-medium">Plate Number</th>
-              <th className="p-3 text-sm font-medium">Model</th>
-              <th className="p-3 text-sm font-medium">Manufacturer</th>
-              <th className="p-3 text-sm font-medium">Year</th>
-              <th className="p-3 text-sm font-medium">Fuel</th>
-              <th className="p-3 text-sm font-medium">Status</th>
-              <th className="p-3 text-sm font-medium text-right">Actions</th>
-            </tr>
-          </thead>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mt-1">
+        <SearchBar
+          value={searchTerm}
+          onChange={setSearchTerm}
+          placeholder="Search by plate, model, or manufacturer"
+        />
 
-          <tbody>
-            {data!.map((v) => (
-              <tr key={v.Id} className="border-b hover:bg-gray-50">
-                <td className="p-3">{v.PlateNumber}</td>
-                <td className="p-3">{v.Model}</td>
-                <td className="p-3">{v.Manufacturer}</td>
-                <td className="p-3">{v.Year}</td>
-                <td className="p-3">{v.FuelType}</td>
-
-                <td className="p-3">
-                  <StatusToggle
-                    id={v.Id}
-                    status={v.Status}
-                    onChangeStatus={handleStatusChange}
-                    disabled={!canToggleStatus}
-                  />
-                </td>
-
-                <td className="p-3 text-right flex justify-end gap-4">
-                  {canEdit && (
-                    <button
-                      onClick={() => handleOpenEdit(v)}
-                      title="Edit"
-                      className="cursor-pointer"
-                    >
-                      <EditIcon />
-                    </button>
-                  )}
-
-                  {canDelete && (
-                    <button
-                      onClick={() => handleOpenDelete(v)}
-                      title="Delete"
-                      className="cursor-pointer"
-                    >
-                      <DeleteIcon />
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <StatusFilter value={statusFilter} onChange={setStatusFilter} />
       </div>
+
+      {filteredVehicles.length === 0 ? (
+        <div className="rounded-lg border bg-white p-8 text-center text-gray-600 shadow">
+          <p className="text-lg font-semibold text-gray-900">
+            {searchTerm || statusFilter !== "All"
+              ? "No vehicles match your filters"
+              : "No vehicles found"}
+          </p>
+          <p className="text-sm text-gray-500 mt-2">
+            Try changing your filters or add a new vehicle.
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="overflow-x-auto rounded-lg border bg-white shadow">
+            <table className="w-full border-collapse text-left text-sm">
+              <thead className="bg-gray-100 border-b">
+                <tr>
+                  <th className="p-3 font-medium">Plate Number</th>
+                  <th className="p-3 font-medium">Model</th>
+                  <th className="p-3 font-medium">Manufacturer</th>
+                  <th className="p-3 font-medium">Year</th>
+                  <th className="p-3 font-medium">Odometer</th>
+                  <th className="p-3 font-medium">Fuel</th>
+                  <th className="p-3 font-medium">Status</th>
+                  <th className="p-3 font-medium">Added</th>
+                  <th className="p-3 font-medium text-right">Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {filteredVehicles.map((v) => (
+                  <tr key={v.Id} className="border-b hover:bg-gray-50">
+                    <td className="p-3 font-medium text-gray-900">
+                      {v.PlateNumber}
+                    </td>
+
+                    <td className="p-3">{v.Model}</td>
+                    <td className="p-3">{v.Manufacturer}</td>
+                    <td className="p-3">{v.Year}</td>
+                    <td className="p-3">{v.Odometer.toLocaleString()} km</td>
+                    <td className="p-3">{v.FuelType}</td>
+
+                    <td className="p-3">
+                      <StatusToggle
+                        id={v.Id}
+                        status={v.Status}
+                        onChangeStatus={handleStatusChange}
+                        disabled={!canToggleStatus}
+                      />
+                    </td>
+
+                    <td className="p-3 text-gray-600">
+                      {formatDate(v.CreatedAt)}
+                    </td>
+
+                    <td className="p-3">
+                      <div className="flex justify-end gap-3">
+                        <button
+                          onClick={() => handleOpenEdit(v)}
+                          disabled={!canEdit}
+                          className={`rounded-full p-2 transition ${
+                            canEdit
+                              ? "text-gray-700 hover:bg-gray-100"
+                              : "text-gray-400 cursor-not-allowed"
+                          }`}
+                        >
+                          <EditIcon />
+                        </button>
+
+                        <button
+                          onClick={() => handleOpenDelete(v)}
+                          disabled={!canDelete}
+                          className={`rounded-full p-2 transition ${
+                            canDelete
+                              ? "text-red-600 hover:bg-red-50"
+                              : "text-gray-400 cursor-not-allowed"
+                          }`}
+                        >
+                          <DeleteIcon />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="flex justify-end mt-4">
+            <button
+              onClick={() => setOpenCreate(true)}
+              disabled={!canCreate}
+              className={`
+                relative px-6 py-3 rounded-lg text-sm font-semibold text-white
+                overflow-hidden group select-none
+                ${
+                  canCreate
+                    ? "bg-black hover:bg-gray-900"
+                    : "bg-gray-400 cursor-not-allowed"
+                }
+              `}
+            >
+              <span
+                className="absolute top-0 left-0 w-12 h-12 bg-white/20 rotate-45
+                           -translate-x-full group-hover:translate-x-[180%]
+                           transition-transform duration-700 ease-in-out rounded-full"
+              ></span>
+
+              <span className="relative z-10">Add Vehicle</span>
+            </button>
+          </div>
+        </>
+      )}
 
       <CreateVehicleDialog
         open={openCreate}
         onClose={() => setOpenCreate(false)}
-        onSuccess={() =>
-          queryClient.invalidateQueries({ queryKey: ["vehicles"] })
-        }
       />
 
       <EditVehicleDialog
         open={openEdit}
         onClose={() => setOpenEdit(false)}
         vehicle={selectedVehicle}
-        onSuccess={() =>
-          queryClient.invalidateQueries({ queryKey: ["vehicles"] })
-        }
       />
 
       <DeleteVehicleModal

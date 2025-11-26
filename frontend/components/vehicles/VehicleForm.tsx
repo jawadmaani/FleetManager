@@ -27,7 +27,7 @@ export default function VehicleForm({
     formState: { errors },
   } = useForm<VehicleRequest>({
     resolver: zodResolver(vehicleRequestSchema),
-    defaultValues: defaultValues ?? {},
+    defaultValues: defaultValues ?? { fuelType: fuelTypeOptions[0] },
   });
 
   return (
@@ -89,9 +89,10 @@ export default function VehicleForm({
       </div>
 
       <div className="flex flex-col">
+        <label className="text-sm font-medium mb-1">Odometer (km)</label>{" "}
         <input
           type="number"
-          {...register("odometer", { valueAsNumber: true })} 
+          {...register("odometer", { valueAsNumber: true })}
           className="p-3 border rounded-md focus:ring-2 focus:ring-black outline-none"
           placeholder="e.g. 50000"
         />
