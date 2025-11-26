@@ -35,6 +35,7 @@ export default function AssignVehicleDialog({
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["drivers"] });
+      queryClient.invalidateQueries({ queryKey: ["vehicles"] });
       onClose();
     },
   });

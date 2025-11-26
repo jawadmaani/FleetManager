@@ -60,6 +60,11 @@ export default function DriversPage() {
     queryFn: getVehicles,
   });
 
+  const vehicleLookup = useMemo(
+    () => new Map(vehicles?.map((vehicle) => [vehicle.Id, vehicle]) ?? []),
+    [vehicles]
+  );
+
   const [selectedDriver, setSelectedDriver] = useState<DriverResponse | null>(
     null
   );
@@ -104,7 +109,7 @@ export default function DriversPage() {
     await updateDriverStatus(id, { status: newStatus });
 
     queryClient.invalidateQueries({ queryKey: ["drivers"] });
-    queryClient.invalidateQueries({ queryKey: ["vehicles"] }); 
+    queryClient.invalidateQueries({ queryKey: ["vehicles"] });
   }
   const stats = useMemo(
     () => ({
@@ -122,10 +127,13 @@ export default function DriversPage() {
 
     return drivers
       .filter((driver) => {
-        const matchesSearch =
-          `${driver.Name} ${driver.LicenseNumber} ${driver.PhoneNumber}`
-            .toLowerCase()
-            .includes(lower);
+        const assignedVehicle = vehicleLookup.get(driver.VehicleId ?? -1);
+        const matchesSearch = `${driver.Name} ${driver.LicenseNumber} ${
+          driver.PhoneNumber
+        } ${assignedVehicle?.PlateNumber ?? ""}`
+
+          .toLowerCase()
+          .includes(lower);
 
         const matchesStatus =
           statusFilter === "All" || driver.Status === statusFilter;
@@ -133,7 +141,7 @@ export default function DriversPage() {
         return matchesSearch && matchesStatus;
       })
       .sort((a, b) => a.Name.localeCompare(b.Name));
-  }, [drivers, searchTerm, statusFilter]);
+  }, [drivers, searchTerm, statusFilter, vehicleLookup]);
 
   if (isLoading)
     return <p className="text-gray-600">Loading drivers, please wait...</p>;
@@ -172,6 +180,14 @@ export default function DriversPage() {
           <p className="text-sm text-gray-500 mt-2">
             Try changing your filters or add a new driver.
           </p>
+          {canCreate && (
+            <button
+              onClick={() => setOpenCreate(true)}
+              className="mt-4 inline-flex items-center justify-center rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white shadow hover:bg-gray-900"
+            >
+              Add Driver
+            </button>
+          )}
         </div>
       ) : (
         <>
@@ -191,9 +207,7 @@ export default function DriversPage() {
 
               <tbody>
                 {filteredDrivers.map((d) => {
-                  const assignedVehicle = vehicles?.find(
-                    (v) => v.Id === d.VehicleId
-                  );
+                  const assignedVehicle = vehicleLookup.get(d.VehicleId ?? -1);
 
                   return (
                     <tr key={d.Id} className="border-b hover:bg-gray-50">
