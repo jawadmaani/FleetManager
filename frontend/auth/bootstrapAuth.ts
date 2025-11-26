@@ -1,9 +1,8 @@
 import { api } from "@/lib/api/apiClient";
 import { useAuthStore } from "@/auth/authStore";
-import { fetchCurrentUser } from "@/lib/api/authApi";
 
 export async function bootstrapAuth() {
-  const { accessToken, setAccessToken, setUser, clearAuth, markInitialized } =
+  const {setAccessToken, setUser, clearAuth, markInitialized } =
     useAuthStore.getState();
 
   try {

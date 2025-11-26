@@ -15,7 +15,7 @@ export function useRoleGuard(allowedRoles: Role[]) {
       return;
     }
 
-    if (!userHasRole(user.role, allowedRoles)) {
+    if (!userHasRole(user.Role, allowedRoles)) {
       router.replace("/unauthorized");
     }
   }, [user, router, allowedRoles]);
