@@ -26,7 +26,7 @@ public class DriverRepository:IDriverRepository
     public async Task<Driver?> GetByIdAsync(int id)
     {
         return await _context.Drivers
-            .AsNoTracking()
+           // .AsNoTracking()
             .Include(d=>d.Vehicle)
             .FirstOrDefaultAsync(d => d.Id == id);
     }
