@@ -7,7 +7,7 @@ import {
   deleteVehicle,
   updateVehicleStatus,
 } from "@/lib/api/vehicleApi";
-import type { VehicleResponse } from "@/lib/validation/Vehicle/vehicleSchema";
+import type { VehicleResponse } from "@/lib/validation/vehicle/vehicleSchema";
 
 import EditVehicleDialog from "@/components/vehicles/EditVehicleDialog";
 import DeleteVehicleModal from "@/components/vehicles/DeleteVehicleModal";

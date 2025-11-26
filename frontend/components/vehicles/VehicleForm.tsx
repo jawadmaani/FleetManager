@@ -6,7 +6,7 @@ import {
   VehicleRequest,
   vehicleRequestSchema,
   fuelTypeSchema,
-} from "@/lib/validation/Vehicle/vehicleSchema";
+} from "@/lib/validation/vehicle/vehicleSchema";
 
 interface VehicleFormProps {
   defaultValues?: VehicleRequest;

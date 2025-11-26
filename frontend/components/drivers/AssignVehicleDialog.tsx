@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getVehicles } from "@/lib/api/vehicleApi";
 import { getDrivers, assignVehicleToDriver } from "@/lib/api/driverApi";
-import type { VehicleResponse } from "@/lib/validation/Vehicle/vehicleSchema";
+import type { VehicleResponse } from "@/lib/validation/vehicle/vehicleSchema";
 import type { DriverResponse } from "@/lib/validation/driver/driverSchema";
 
 interface Props {

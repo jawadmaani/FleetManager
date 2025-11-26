@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import VehicleForm from "./VehicleForm";
-import { VehicleRequest } from "@/lib/validation/Vehicle/vehicleSchema";
+import { VehicleRequest } from "@/lib/validation/vehicle/vehicleSchema";
 import { createVehicle } from "@/lib/api/vehicleApi";
 
 interface Props {
