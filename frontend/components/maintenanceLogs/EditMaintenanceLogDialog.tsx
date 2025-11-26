@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import MaintenanceLogForm from "./MaintenanceLogForm";
 
 import {
-  MaintenanceLogRequest,
+  MaintenanceLogUpdate,
   MaintenanceLogResponse,
 } from "@/lib/validation/maintenanceLog/maintenanceLogSchema";
 
@@ -29,7 +29,7 @@ export default function EditMaintenanceLogDialog({
   const queryClient = useQueryClient();
 
   const updateMutation = useMutation({
-    mutationFn: (data: MaintenanceLogRequest) =>
+    mutationFn: (data: MaintenanceLogUpdate) =>
       updateMaintenanceLog(log?.Id ?? 0, data),
 
     onSuccess: () => {
@@ -41,16 +41,15 @@ export default function EditMaintenanceLogDialog({
 
   if (!open || !log) return null;
 
-  const defaultValues: Partial<MaintenanceLogRequest> = {
+  const defaultValues: Partial<MaintenanceLogUpdate> = {
     maintenanceType: log.MaintenanceType,
     maintenanceDate: log.MaintenanceDate.split("T")[0],
     cost: log.Cost,
     description: log.Description ?? "",
     performedBy: log.PerformedBy,
-    vehicleId: log.VehicleId,
   };
 
-  async function handleEdit(data: MaintenanceLogRequest) {
+  async function handleEdit(data: MaintenanceLogUpdate) {
     await updateMutation.mutateAsync(data);
   }
 
@@ -70,6 +69,7 @@ export default function EditMaintenanceLogDialog({
           onSubmit={handleEdit}
           defaultValues={defaultValues}
           vehicles={vehicles}
+          hideVehicleField={true}
           submitText={updateMutation.isPending ? "Updating..." : "Update Log"}
         />
       </div>

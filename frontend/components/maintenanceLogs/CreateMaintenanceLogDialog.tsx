@@ -33,8 +33,10 @@ export default function CreateMaintenanceLogDialog({
     },
   });
 
-  async function handleCreate(data: MaintenanceLogRequest) {
-    await createMutation.mutateAsync(data);
+  async function handleCreate(data: MaintenanceLogRequest | Omit<MaintenanceLogRequest, 'vehicleId'>) {
+    if ('vehicleId' in data) {
+      await createMutation.mutateAsync(data);
+    }
   }
 
   if (!open) return null;

@@ -6,15 +6,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   MaintenanceLogRequest,
   maintenanceLogRequestSchema,
+  MaintenanceLogUpdate,
+  maintenanceLogUpdateSchema,
 } from "@/lib/validation/maintenanceLog/maintenanceLogSchema";
 
 import type { VehicleResponse } from "@/lib/validation/vehicle/vehicleSchema";
 
 interface MaintenanceLogFormProps {
-  defaultValues?: Partial<MaintenanceLogRequest>;
-  onSubmit: (data: MaintenanceLogRequest) => Promise<void>;
+  defaultValues?: Partial<MaintenanceLogRequest | MaintenanceLogUpdate>;
+  onSubmit: (
+    data: MaintenanceLogRequest | MaintenanceLogUpdate
+  ) => Promise<void>;
   submitText: string;
   vehicles: VehicleResponse[];
+  hideVehicleField?: boolean; 
 }
 
 export default function MaintenanceLogForm({
@@ -22,23 +27,28 @@ export default function MaintenanceLogForm({
   onSubmit,
   submitText,
   vehicles,
+  hideVehicleField = false,
 }: MaintenanceLogFormProps) {
+  const schema = hideVehicleField
+    ? maintenanceLogUpdateSchema
+    : maintenanceLogRequestSchema;
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<MaintenanceLogRequest>({
-    resolver: zodResolver(maintenanceLogRequestSchema),
+  } = useForm<MaintenanceLogRequest | MaintenanceLogUpdate>({
+    resolver: zodResolver(schema),
     defaultValues: {
       description: null,
       ...defaultValues,
     },
   });
 
-  const handleFormSubmit = (values: MaintenanceLogRequest) => {
+  const handleFormSubmit = (values: MaintenanceLogRequest | MaintenanceLogUpdate) => {
     const isoDate = new Date(values.maintenanceDate).toISOString();
 
-    const finalData: MaintenanceLogRequest = {
+    const finalData = {
       ...values,
       maintenanceDate: isoDate,
     };
@@ -60,7 +70,7 @@ export default function MaintenanceLogForm({
         />
         {errors.maintenanceType && (
           <span className="text-red-500 text-sm">
-            {errors.maintenanceType.message}
+            {errors.maintenanceType.message as string}
           </span>
         )}
       </div>
@@ -74,7 +84,7 @@ export default function MaintenanceLogForm({
         />
         {errors.maintenanceDate && (
           <span className="text-red-500 text-sm">
-            {errors.maintenanceDate.message}
+            {errors.maintenanceDate.message as string}
           </span>
         )}
       </div>
@@ -89,7 +99,9 @@ export default function MaintenanceLogForm({
           placeholder="e.g. 120.50"
         />
         {errors.cost && (
-          <span className="text-red-500 text-sm">{errors.cost.message}</span>
+          <span className="text-red-500 text-sm">
+            {errors.cost.message as string}
+          </span>
         )}
       </div>
 
@@ -98,34 +110,36 @@ export default function MaintenanceLogForm({
         <input
           {...register("performedBy")}
           className="p-3 border rounded-md focus:ring-2 focus:ring-black outline-none"
-          placeholder="e.g. AutoFix Garage"
+          placeholder="e.g. AutoFix"
         />
         {errors.performedBy && (
           <span className="text-red-500 text-sm">
-            {errors.performedBy.message}
+            {errors.performedBy.message as string}
           </span>
         )}
       </div>
 
-      <div className="flex flex-col">
-        <label className="text-sm font-medium mb-1">Vehicle</label>
-        <select
-          {...register("vehicleId", { valueAsNumber: true })}
-          className="p-3 border rounded-md focus:ring-2 focus:ring-black outline-none"
-        >
-          <option value="">Select vehicle...</option>
-          {vehicles.map((v) => (
-            <option key={v.Id} value={v.Id}>
-              {v.PlateNumber} — {v.Model}
-            </option>
-          ))}
-        </select>
-        {errors.vehicleId && (
-          <span className="text-red-500 text-sm">
-            {errors.vehicleId.message}
-          </span>
-        )}
-      </div>
+      {!hideVehicleField && (
+        <div className="flex flex-col">
+          <label className="text-sm font-medium mb-1">Vehicle</label>
+          <select
+            {...register("vehicleId", { valueAsNumber: true })}
+            className="p-3 border rounded-md focus:ring-2 focus:ring-black outline-none"
+          >
+            <option value="">Select vehicle...</option>
+            {vehicles.map((v) => (
+              <option key={v.Id} value={v.Id}>
+                {v.PlateNumber} — {v.Model}
+              </option>
+            ))}
+          </select>
+          {"vehicleId" in errors && errors.vehicleId && (
+            <span className="text-red-500 text-sm">
+              {errors.vehicleId.message as string}
+            </span>
+          )}
+        </div>
+      )}
 
       <div className="flex flex-col col-span-full">
         <label className="text-sm font-medium mb-1">Description</label>
@@ -137,7 +151,7 @@ export default function MaintenanceLogForm({
         />
         {errors.description && (
           <span className="text-red-500 text-sm">
-            {errors.description.message}
+            {errors.description.message as string}
           </span>
         )}
       </div>
