@@ -27,7 +27,7 @@ import AssignVehicleButton from "@/components/drivers/AssignVehicleButton";
 
 import { useAuthStore } from "@/auth/authStore";
 import { getVehicles } from "@/lib/api/vehicleApi";
-import type { VehicleResponse } from "@/lib/validation/Vehicle/vehicleSchema";
+import type { VehicleResponse } from "@/lib/validation/vehicle/vehicleSchema";
 
 function formatDate(dateString: string) {
   return new Date(dateString).toLocaleDateString("en-US", {

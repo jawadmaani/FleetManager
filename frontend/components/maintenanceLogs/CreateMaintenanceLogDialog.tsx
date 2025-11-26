@@ -1,34 +1,39 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import VehicleForm from "./VehicleForm";
-import { VehicleRequest } from "@/lib/validation/vehicle/vehicleSchema";
-import { createVehicle } from "@/lib/api/vehicleApi";
+import MaintenanceLogForm from "./MaintenanceLogForm";
+
+import { MaintenanceLogRequest } from "@/lib/validation/maintenanceLog/maintenanceLogSchema";
+
+import { createMaintenanceLog } from "@/lib/api/maintenanceLogApi";
+import type { VehicleResponse } from "@/lib/validation/vehicle/vehicleSchema";
 
 interface Props {
   open: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  vehicles: VehicleResponse[];
 }
 
-export default function CreateVehicleDialog({
+export default function CreateMaintenanceLogDialog({
   open,
   onClose,
   onSuccess,
+  vehicles,
 }: Props) {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
-    mutationFn: (data: VehicleRequest) => createVehicle(data),
+    mutationFn: (data: MaintenanceLogRequest) => createMaintenanceLog(data),
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["vehicles"] });
+      queryClient.invalidateQueries({ queryKey: ["maintenanceLogs"] });
       onSuccess?.();
       onClose();
     },
   });
 
-  async function handleCreate(data: VehicleRequest) {
+  async function handleCreate(data: MaintenanceLogRequest) {
     await createMutation.mutateAsync(data);
   }
 
@@ -44,13 +49,12 @@ export default function CreateVehicleDialog({
           ✕
         </button>
 
-        <h1 className="text-2xl font-semibold mb-6">Add Vehicle</h1>
+        <h1 className="text-2xl font-semibold mb-6">Add Maintenance Log</h1>
 
-        <VehicleForm
+        <MaintenanceLogForm
+          vehicles={vehicles}
           onSubmit={handleCreate}
-          submitText={
-            createMutation.isPending ? "Creating..." : "Create Vehicle"
-          }
+          submitText={createMutation.isPending ? "Creating..." : "Create Log"}
         />
       </div>
     </div>

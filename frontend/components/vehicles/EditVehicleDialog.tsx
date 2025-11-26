@@ -5,7 +5,7 @@ import VehicleForm from "./VehicleForm";
 import {
   VehicleRequest,
   VehicleResponse,
-} from "@/lib/validation/Vehicle/vehicleSchema";
+} from "@/lib/validation/vehicle/vehicleSchema";
 import { updateVehicle } from "@/lib/api/vehicleApi";
 
 interface EditVehicleDialogProps {

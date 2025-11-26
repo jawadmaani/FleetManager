@@ -5,7 +5,7 @@ import {
   VehicleRequest,
   VehicleResponse,
   statusSchema,
-} from "@/lib/validation/Vehicle/vehicleSchema";
+} from "@/lib/validation/vehicle/vehicleSchema";
 import { z } from "zod";
 
 export async function getVehicles(): Promise<VehicleResponse[]> {
