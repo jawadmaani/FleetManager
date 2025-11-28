@@ -2,11 +2,8 @@ import { api } from "@/lib/api/apiClient";
 import { z } from "zod";
 
 import {
-  monthlyVehicleCostSchema,
   monthlyVehicleCostListSchema,
-  vehicleTotalCostSchema,
   vehicleTotalCostListSchema,
-  monthlyTotalCostSchema,
   monthlyTotalCostListSchema,
   MonthlyVehicleCost,
   VehicleTotalCost,

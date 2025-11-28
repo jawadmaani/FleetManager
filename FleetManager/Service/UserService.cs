@@ -79,8 +79,26 @@ public class UserService:IUserService
         
     }
     
-  
-    public async Task<UserResponseDto> UpdateUserAsync(int id, UserUpdateDto dto)
+    public async Task<UserResponseDto> CreateUserAsync(UserSaveDto dto)
+    {
+        var existing = await _repository.GetUserByUsernameAsync(dto.Username);
+        if (existing != null)
+            throw new UserAlreadyExistsException("Username already exists");
+
+        var user = new User
+        {
+            Username = dto.Username,
+            passwordHash = _passwordHasher.HashPassword(dto.Password),
+            role = dto.Role
+        };
+
+        await _repository.AddAsync(user);
+        await _repository.SaveAsync();
+
+        return UserMapper.ToUserResponseDto(user);
+    }
+    
+    public async Task<UserResponseDto> UpdateUserAsync(int id, UserSaveDto  dto)
     {
         var user = await _repository.GetByIdAsync(id);
         if (user == null)
