@@ -2,7 +2,7 @@
 using System.Text.Json.Serialization;
 using FleetManager.Model.Enums;
 
-public class UserUpdateDto
+public class UserSaveDto
 {
     [Required]
     [MaxLength(50)]
