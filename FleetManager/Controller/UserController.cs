@@ -32,10 +32,18 @@ namespace FleetManager.Controller
             var user = await _userService.GetUserByIdAsync(id);
             return Ok(user);
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<ActionResult<UserResponseDto>> CreateUserAsync([FromBody] UserSaveDto userCreateDto)
+        {
+            var user = await _userService.CreateUserAsync(userCreateDto);
+            return Ok(user);
+        }
         
         [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}")]
-        public async Task<ActionResult<UserResponseDto>> UpdateUserAsync(int id, UserUpdateDto userUpdateDto)
+        public async Task<ActionResult<UserResponseDto>> UpdateUserAsync(int id, UserSaveDto userUpdateDto)
         {
             var user = await _userService.UpdateUserAsync(id, userUpdateDto);
             return Ok(user);

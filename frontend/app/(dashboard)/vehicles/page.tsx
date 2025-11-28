@@ -151,9 +151,19 @@ export default function VehiclesPage() {
               ? "No vehicles match your filters"
               : "No vehicles found"}
           </p>
+
           <p className="text-sm text-gray-500 mt-2">
             Try changing your filters or add a new vehicle.
           </p>
+
+          {canCreate && (
+            <button
+              onClick={() => setOpenCreate(true)}
+              className="mt-4 inline-flex items-center justify-center rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white shadow hover:bg-gray-900"
+            >
+              Add Vehicle
+            </button>
+          )}
         </div>
       ) : (
         <>
@@ -202,25 +212,27 @@ export default function VehiclesPage() {
                     <td className="p-3">
                       <div className="flex justify-end gap-3">
                         <button
-                          onClick={() => handleOpenEdit(v)}
+                          onClick={() => canEdit && handleOpenEdit(v)}
                           disabled={!canEdit}
-                          className={`rounded-full p-2 transition ${
-                            canEdit
-                              ? "text-gray-700 hover:bg-gray-100"
-                              : "text-gray-400 cursor-not-allowed"
-                          }`}
+                          className={`rounded-full p-2 transition
+        ${
+          canEdit
+            ? "text-gray-700 hover:bg-gray-100"
+            : "text-gray-400 cursor-not-allowed"
+        }`}
                         >
                           <EditIcon />
                         </button>
 
                         <button
-                          onClick={() => handleOpenDelete(v)}
+                          onClick={() => canDelete && handleOpenDelete(v)}
                           disabled={!canDelete}
-                          className={`rounded-full p-2 transition ${
-                            canDelete
-                              ? "text-red-600 hover:bg-red-50"
-                              : "text-gray-400 cursor-not-allowed"
-                          }`}
+                          className={`rounded-full p-2 transition
+        ${
+          canDelete
+            ? "text-red-600 hover:bg-red-50"
+            : "text-gray-300 cursor-not-allowed"
+        }`}
                         >
                           <DeleteIcon />
                         </button>

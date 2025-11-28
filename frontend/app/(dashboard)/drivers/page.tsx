@@ -227,10 +227,16 @@ export default function DriversPage() {
                       </td>
 
                       <td className="p-3">
-                        <AssignVehicleButton
-                          driverId={d.Id}
-                          plateNumber={assignedVehicle?.PlateNumber ?? null}
-                        />
+                        {user?.Role === "Admin" ? (
+                          <AssignVehicleButton
+                            driverId={d.Id}
+                            plateNumber={assignedVehicle?.PlateNumber ?? null}
+                          />
+                        ) : (
+                          <span className="text-gray-700">
+                            {assignedVehicle?.PlateNumber ?? "No Vehicle"}
+                          </span>
+                        )}
                       </td>
 
                       <td className="p-3 text-gray-600">
