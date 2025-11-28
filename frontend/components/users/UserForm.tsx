@@ -35,35 +35,47 @@ export default function UserForm({
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium mb-1">Username</label>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-800">
+          Username
+        </label>
         <input
           {...register("username")}
-          className="w-full border rounded p-2"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-black/60"
           placeholder="Enter username"
+          autoComplete="username"
         />
+        <p className="text-xs text-gray-500">
+          Use letters, numbers, dots, underscores, or dashes.
+        </p>
         {errors.username && (
           <p className="text-red-600 text-sm">{errors.username.message}</p>
         )}
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Password</label>
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-800">
+          Password
+        </label>
         <input
           {...register("password")}
           type="password"
-          className="w-full border rounded p-2"
-          placeholder="Enter password"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-black/60"
+          placeholder="Create a secure password"
+          autoComplete="new-password"
         />
         {errors.password && (
           <p className="text-red-600 text-sm">{errors.password.message}</p>
         )}
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Role</label>
-        <select {...register("role")} className="w-full border rounded p-2">
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-800">Role</label>
+        <select
+          {...register("role")}
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm bg-white focus:border-black focus:outline-none focus:ring-2 focus:ring-black/60"
+        >
           {userRoleSchema.options.map((role) => (
             <option key={role} value={role}>
               {role}
@@ -78,7 +90,7 @@ export default function UserForm({
 
       <button
         type="submit"
-        className="mt-3 px-4 py-2 bg-black text-white rounded hover:bg-gray-900"
+        className="mt-4 inline-flex w-full items-center justify-center rounded-lg bg-black px-4 py-3 text-sm font-semibold text-white shadow hover:bg-gray-900"
       >
         {submitText}
       </button>

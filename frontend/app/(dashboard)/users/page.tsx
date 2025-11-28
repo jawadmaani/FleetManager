@@ -70,23 +70,25 @@ export default function UsersPage() {
     setOpenDelete(true);
   }
 
-  const stats = useMemo(
-    () => ({
-      total: data?.length ?? 0,
-      active: 0,
-      inactive: 0,
-    }),
-    [data]
-  );
+  const stats = useMemo(() => {
+    const total = data?.length ?? 0;
+    const adminCount = data?.filter((u) => u.Role === "Admin").length ?? 0;
+
+    return {
+      total,
+      admins: adminCount,
+      others: total - adminCount,
+    };
+  }, [data]);
 
   const filteredUsers = useMemo(() => {
     if (!data) return [];
 
     const lower = searchTerm.trim().toLowerCase();
 
-    return data.filter((u) =>
-      `${u.Username} ${u.Role}`.toLowerCase().includes(lower)
-    );
+    return data
+      .filter((u) => `${u.Username} ${u.Role}`.toLowerCase().includes(lower))
+      .sort((a, b) => a.Username.localeCompare(b.Username));
   }, [data, searchTerm]);
 
   if (isLoading)
@@ -99,7 +101,13 @@ export default function UsersPage() {
   return (
     <div className="space-y-6 mt-2">
       <div className="flex items-center justify-between mt-1">
-        <StatsCards total={stats.total} active={0} inactive={0} />
+        <StatsCards
+          total={stats.total}
+          active={stats.admins}
+          inactive={stats.others}
+          activeLabel="Admins"
+          inactiveLabel="Non-admins"
+        />
       </div>
 
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mt-1">
@@ -108,6 +116,14 @@ export default function UsersPage() {
           onChange={setSearchTerm}
           placeholder="Search by username or role"
         />
+        {canCreate && (
+          <button
+            onClick={() => setOpenCreate(true)}
+            className="inline-flex items-center justify-center rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white shadow hover:bg-gray-900"
+          >
+            Add User
+          </button>
+        )}
       </div>
 
       {filteredUsers.length === 0 ? (
@@ -118,8 +134,17 @@ export default function UsersPage() {
               : "No users found in the system"}
           </p>
           <p className="text-sm text-gray-500 mt-2">
-            Try searching for a different user.
+            Try searching for a different user or add a new one.
           </p>
+
+          {canCreate && (
+            <button
+              onClick={() => setOpenCreate(true)}
+              className="mt-5 inline-flex items-center justify-center rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white shadow hover:bg-gray-900"
+            >
+              Add User
+            </button>
+          )}
         </div>
       ) : (
         <>
@@ -141,8 +166,11 @@ export default function UsersPage() {
                       {u.Username}
                     </td>
 
-                    <td className="p-3">{u.Role}</td>
-
+                    <td className="p-3">
+                      <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-800">
+                        {u.Role}
+                      </span>
+                    </td>
                     <td className="p-3 text-gray-600">
                       {formatDate(u.CreatedAt)}
                     </td>
