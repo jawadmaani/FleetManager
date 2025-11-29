@@ -65,13 +65,6 @@ export default function DashboardLayout({
             Maintenance Logs
           </Link>
 
-          <Link
-            href="/reports"
-            className="flex items-center py-2 px-4 rounded hover:bg-gray-100 transition text-gray-700 font-medium"
-          >
-            <ReportsIcon />
-            Reports
-          </Link>
 
           {user.Role === "Admin" && (
             <Link
