@@ -116,14 +116,7 @@ export default function UsersPage() {
           onChange={setSearchTerm}
           placeholder="Search by username or role"
         />
-        {canCreate && (
-          <button
-            onClick={() => setOpenCreate(true)}
-            className="inline-flex items-center justify-center rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white shadow hover:bg-gray-900"
-          >
-            Add User
-          </button>
-        )}
+      
       </div>
 
       {filteredUsers.length === 0 ? (

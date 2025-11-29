@@ -64,11 +64,7 @@ export default function RegisterPage() {
       <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
         <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="text-black flex items-center gap-6 justify-center">
-            <img
-              src="/output.svg"
-              alt="App Logo"
-              className="w-24 h-24 md:w-28 md:h-28"
-            />
+         
 
             <div className="flex flex-col justify-center">
               <h1 className="text-4xl md:text-5xl font-bold mb-4 whitespace-nowrap">
