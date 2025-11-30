@@ -7,7 +7,6 @@ import { DashboardIcon } from "@/components/ui/DashboardIcon";
 import { VehicleIcon } from "@/components/ui/VehicleIcon";
 import { DriversIcon } from "@/components/ui/DriversIcon";
 import { MaintenanceIcon } from "@/components/ui/MaintenanceIcon";
-import { ReportsIcon } from "@/components/ui/ReportsIcon";
 import { UsersIcon } from "@/components/ui/UsersIcon";
 
 export default function DashboardLayout({

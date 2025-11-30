@@ -158,6 +158,7 @@ export default function UsersPage() {
                     <td className="p-3 font-medium text-gray-900">
                       {u.Username}
                     </td>
+                    
 
                     <td className="p-3">
                       <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-800">
